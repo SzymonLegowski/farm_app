@@ -45,6 +45,6 @@ public class Litter {
     private List<Event> events;
 
     @ManyToOne
-    @JoinColumn(name="sowId", nullable = false)
+    @JoinColumn(name = "sowId", nullable = false)
     private Sow sow;
 }
