@@ -6,6 +6,9 @@ import java.util.List;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -19,6 +22,7 @@ import lombok.Setter;
 @Entity
 @Getter
 @Setter
+@JsonPropertyOrder()
 public class Litter {
     
     @Id
@@ -46,5 +50,6 @@ public class Litter {
 
     @ManyToOne
     @JoinColumn(name = "sowId", nullable = false)
+    @JsonIgnoreProperties({"litters", "events"})
     private Sow sow;
 }

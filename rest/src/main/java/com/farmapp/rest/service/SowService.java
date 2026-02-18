@@ -1,17 +1,16 @@
 package com.farmapp.rest.service;
 
 import java.util.List;
+import java.util.Optional;
 
 import com.farmapp.rest.entity.Sow;
 
-import io.reactivex.rxjava3.core.Completable;
-import io.reactivex.rxjava3.core.Single;
-
 public interface SowService {
 
-    Single<Sow> setSow(Sow sow);
-    Single<List<Sow>> getAllSows();
-    Single<List<Sow>> getSowsById(List<Long> sowIds);
-    Completable deleteSowsById(List<Long> sowIds);
+    Sow setSow(Sow sow);
+    List<Sow> getAllSows();
+    Optional<Sow> getSowById(Long id);
+    List<Sow> getSowsById(List<Long> ids);
+    void deleteSow(Long id);
 
 }

@@ -1,36 +1,45 @@
 package com.farmapp.rest.service;
 
 import java.util.List;
+import java.util.Optional;
+
+import org.springframework.stereotype.Service;
 
 import com.farmapp.rest.entity.Litter;
+import com.farmapp.rest.repository.LitterRepository;
 
-import io.reactivex.rxjava3.core.Completable;
-import io.reactivex.rxjava3.core.Single;
-
+@Service
 public class LitterServiceImpl implements LitterService{
 
-    @Override
-    public Single<Litter> setLitter(Litter litter) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'setLitter'");
+    private final LitterRepository litterRepository;
+
+    public LitterServiceImpl(LitterRepository litterRepository){
+        this.litterRepository = litterRepository;
     }
 
     @Override
-    public Single<List<Litter>> getAllLitters() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getAllLitters'");
+    public Litter setLitter(Litter litter) {
+        return litterRepository.save(litter);
     }
 
     @Override
-    public Single<List<Litter>> getLittersById(List<Long> litterIds) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getLittersById'");
+    public List<Litter> getAllLitters() {
+        return litterRepository.findAll();
     }
 
     @Override
-    public Completable deleteLittersById(List<Long> litterIds) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'deleteLittersById'");
+    public Optional<Litter> getLitterById(Long id) {
+        return litterRepository.findById(id);
+    }
+
+    @Override
+    public List<Litter> getLittersById(List<Long> ids) {
+        return litterRepository.findAllById(ids);
+    }
+
+    @Override
+    public void deleteLitter(Long id) {
+        litterRepository.deleteById(id);
     }
 
 }

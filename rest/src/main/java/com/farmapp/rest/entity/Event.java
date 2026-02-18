@@ -8,6 +8,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import com.farmapp.rest.enums.EventType;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -39,8 +40,10 @@ public class Event {
     private Instant dateModified;
 
     @ManyToMany
+    // @JsonIgnoreProperties({"events", "litters"})
     private List<Sow> sows;
     
     @ManyToMany
+    // @JsonIgnoreProperties({"events"})
     private List<Litter> litters;
 }

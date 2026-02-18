@@ -1,15 +1,12 @@
 package com.farmapp.rest.service;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
 import com.farmapp.rest.entity.Sow;
 import com.farmapp.rest.repository.SowRepository;
-
-import io.reactivex.rxjava3.core.Completable;
-import io.reactivex.rxjava3.core.Single;
-import lombok.NonNull;
 
 @Service
 public class SowServiceImpl implements SowService{
@@ -21,23 +18,28 @@ public class SowServiceImpl implements SowService{
     }
 
     @Override
-    public Single<Sow> setSow(@NonNull Sow sow) {
-        return Single.just(sowRepository.saveAndFlush(sow));
+    public Sow setSow(Sow sow) {
+        return sowRepository.saveAndFlush(sow);
     }
 
     @Override
-    public Single<List<Sow>> getAllSows() {
-        return Single.just(sowRepository.findAll());        
+    public List<Sow> getAllSows() {
+        return sowRepository.findAll();        
     }
 
     @Override
-    public Single<List<Sow>> getSowsById(@NonNull List<Long> sowIds) {
-        return Single.just(sowRepository.findAllById(sowIds));
+    public Optional<Sow> getSowById(Long id) {
+        return sowRepository.findById(id);
     }
 
     @Override
-    public Completable deleteSowsById(List<Long> sowIds) {
-        return Completable.fromAction(() -> sowRepository.deleteAllById(sowIds));
+    public List<Sow> getSowsById(List<Long> ids) {
+        return sowRepository.findAllById(ids);
+    }
+
+    @Override
+    public void deleteSow(Long id) {
+        sowRepository.deleteById(id);
     }
 
 }

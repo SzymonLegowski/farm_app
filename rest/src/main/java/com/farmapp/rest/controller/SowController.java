@@ -6,15 +6,14 @@ import org.springframework.web.bind.annotation.RestController;
 import com.farmapp.rest.entity.Sow;
 import com.farmapp.rest.service.SowService;
 
-import io.reactivex.rxjava3.core.Single;
-
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.List;
+import java.util.Optional;
 
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
@@ -22,7 +21,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/sows")
 public class SowController {
 
     private final SowService sowService;
@@ -31,20 +30,28 @@ public class SowController {
         this.sowService = sowService;
     }
 
-    @PostMapping("/sows")
-    public Single<Sow> createSow(@RequestBody Sow sow) {
+    @PostMapping()
+    public Sow createSow(@RequestBody Sow sow) {
         return sowService.setSow(sow);
     }
 
-    @GetMapping("/sows")
-    public Single<List<Sow>> getAllSows() {
+    @GetMapping()
+    public List<Sow> getAllSows() {
         return sowService.getAllSows();
     }
 
-    @PutMapping("/sows/{id}")
-    public Single<Sow> putMethodName(@PathVariable Long id, @RequestBody Sow sow) {        
+    @GetMapping("/{id}")
+    public Optional<Sow> getSowById(@PathVariable Long id){
+        return sowService.getSowById(id);
+    }
+
+    @PutMapping("/{id}")
+    public Sow updateSow(@PathVariable Long id, @RequestBody Sow sow) {        
         return sowService.setSow(sow);
     }
-    
-    
+
+    @DeleteMapping()
+    public void deleteSow(@PathVariable Long id){
+        sowService.deleteSow(id);
+    }
 }

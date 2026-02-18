@@ -50,11 +50,11 @@ public class Sow {
     private Instant dateModified;
     
     @ManyToMany
-    @JsonIgnoreProperties({"litters"})
+    // @JsonIgnoreProperties({"litters", "sows"})
     private List<Event> events;
     
     @OneToMany(mappedBy="sow")
-    @JsonIgnoreProperties({"events"})
+    @JsonIgnoreProperties({"events", "sow"})
     private List<Litter> litters;
 
     public Sow(Integer number, SowStatus status, String note){

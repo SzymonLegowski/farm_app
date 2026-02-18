@@ -1,17 +1,16 @@
 package com.farmapp.rest.service;
 
 import java.util.List;
+import java.util.Optional;
 
 import com.farmapp.rest.entity.Litter;
 
-import io.reactivex.rxjava3.core.Completable;
-import io.reactivex.rxjava3.core.Single;
-
 public interface LitterService {
 
-    Single<Litter> setLitter(Litter litter);
-    Single<List<Litter>> getAllLitters();
-    Single<List<Litter>> getLittersById(List<Long> litterIds);
-    Completable deleteLittersById(List<Long> litterIds);
+    Litter setLitter(Litter litter);
+    List<Litter> getAllLitters();
+    Optional<Litter> getLitterById(Long id);
+    List<Litter> getLittersById(List<Long> ids);
+    void deleteLitter(Long id);
 
 }
