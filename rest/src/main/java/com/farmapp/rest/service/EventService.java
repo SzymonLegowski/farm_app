@@ -1,16 +1,17 @@
 package com.farmapp.rest.service;
 
 import java.util.List;
-import java.util.Optional;
 
-import com.farmapp.rest.entity.Event;
+import com.farmapp.rest.dto.EventDto;
+import com.farmapp.rest.dto.EventRequest;
 
 public interface EventService {
   
-    Event setEvent(Event event);
-    List<Event> getAllEvents();
-    Optional<Event> getEventById(Long id);
-    List<Event> getEventsById(List<Long> ids);
+    EventDto createEvent(EventRequest eventRequest);
+    EventDto updateEvent(EventRequest eventRequest, Long id);
+    List<EventDto> getAllEvents();
+    EventDto getEventById(Long id);
+    List<EventDto> getEventsById(List<Long> ids);
     void deleteEvent(Long id);
    
 }

@@ -9,9 +9,6 @@ import com.farmapp.rest.service.LitterService;
 import java.util.List;
 
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.PathVariable;
 
 
 
@@ -31,8 +28,8 @@ public class LitterController {
         return litterService.getAllLitters();
     }
     
-    @PutMapping("/{id}")
-    public Litter updateLitter(@PathVariable String id, @RequestBody Litter litter) {
-        return litterService.setLitter(litter);
-    }
+//     @PutMapping("/{id}")
+//     public Litter updateLitter(@PathVariable String id, @RequestBody LitterDto litterDto) {
+//         return litterService.createLitter(litterDto);
+//     }
 }

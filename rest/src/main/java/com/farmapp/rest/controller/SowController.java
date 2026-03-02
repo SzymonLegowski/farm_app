@@ -1,17 +1,19 @@
 package com.farmapp.rest.controller;
 
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.farmapp.rest.entity.Sow;
+import com.farmapp.rest.dto.SowDto;
 import com.farmapp.rest.service.SowService;
 
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.List;
-import java.util.Optional;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -31,27 +33,29 @@ public class SowController {
     }
 
     @PostMapping()
-    public Sow createSow(@RequestBody Sow sow) {
-        return sowService.setSow(sow);
+    @ResponseStatus(HttpStatus.CREATED)
+    public ResponseEntity<SowDto> createSow(@RequestBody SowDto sow) {
+        return new ResponseEntity<>(sowService.createSow(sow), HttpStatus.CREATED);
     }
 
     @GetMapping()
-    public List<Sow> getAllSows() {
-        return sowService.getAllSows();
+    public ResponseEntity<List<SowDto>> getAllSows() {
+        return new ResponseEntity<>(sowService.getAllSows(), HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
-    public Optional<Sow> getSowById(@PathVariable Long id){
-        return sowService.getSowById(id);
+    public ResponseEntity<SowDto> getSowById(@PathVariable Long id){
+        return new ResponseEntity<>(sowService.getSowById(id), HttpStatus.OK);
     }
 
     @PutMapping("/{id}")
-    public Sow updateSow(@PathVariable Long id, @RequestBody Sow sow) {        
-        return sowService.setSow(sow);
+    public ResponseEntity<SowDto> updateSow(@PathVariable Long id, @RequestBody SowDto sow) {        
+        return new ResponseEntity<>(sowService.updateSow(sow, id), HttpStatus.OK);
     }
 
-    @DeleteMapping()
-    public void deleteSow(@PathVariable Long id){
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> deleteSow(@PathVariable Long id){
         sowService.deleteSow(id);
+        return new ResponseEntity<>("Sow delete", HttpStatus.OK);
     }
 }
