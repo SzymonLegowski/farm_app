@@ -6,11 +6,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.farmapp.rest.dto.EventDto;
 import com.farmapp.rest.dto.EventRequest;
+import com.farmapp.rest.entity.Event;
 import com.farmapp.rest.service.EventService;
 
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import java.time.YearMonth;
 import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -30,13 +32,18 @@ public class EventController {
 
     @PostMapping()
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<EventDto> createEvent(@RequestBody EventRequest eventRequest) {
+    public ResponseEntity<Event> createEvent(@RequestBody EventRequest eventRequest) {
         return new ResponseEntity<>(eventService.createEvent(eventRequest), HttpStatus.CREATED);
     }
 
     @GetMapping()
     public ResponseEntity<List<EventDto>> getAllEvents() {
         return new ResponseEntity<>(eventService.getAllEvents(), HttpStatus.OK);
+    }
+
+    @GetMapping("/{year}/{month}")
+    public ResponseEntity<List<Event>> getEventsOfMonth(@PathVariable int year, @PathVariable int month){
+        return new ResponseEntity<>(eventService.getEventsOfMonth(year, month), HttpStatus.OK);
     }
 
     @GetMapping("/{id}")

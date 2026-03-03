@@ -1,5 +1,7 @@
 package com.farmapp.rest.service;
 
+import java.time.LocalDate;
+import java.time.YearMonth;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -35,7 +37,7 @@ public class EventServiceImpl implements EventService{
 
     @Override
     @Transactional
-    public EventDto createEvent(EventRequest eventRequest) {
+    public Event createEvent(EventRequest eventRequest) {
         EventDto eventDto = eventRequest.eventDto();
         Set<Long> sowIds = eventDto.sowIds() != null ? eventDto.sowIds() : new HashSet<>();
         Set<Long> litterIds = eventDto.litterIds() != null ? eventDto.litterIds() : new HashSet<>();
@@ -59,12 +61,12 @@ public class EventServiceImpl implements EventService{
             sows.forEach(sow -> sow.setStatus(Sow.getStatusByEventType(event.getEventType())));
 
         if(eventRequest.sowGroup() != 0)
-            sows.forEach(sow -> sow.setGroup(eventRequest.sowGroup()));
+            sows.forEach(sow -> sow.setGroupNumber(eventRequest.sowGroup()));
 
         if(event.getEventType() == EventType.INSEMINATION)
             sows.forEach(sow -> {
                 if(litters.stream().noneMatch(l -> l.getSow().getId().equals(sow.getId()))){
-                    Litter litter = sow.getLatestOrDefaultLitter();
+                    Litter litter = sow.resolveLatestOrDefaultLitter();
                     if(litter.isFarrowed())
                         litter = Litter.defaultLitter(sow);
                     litters.add(litter);
@@ -73,7 +75,7 @@ public class EventServiceImpl implements EventService{
         event.addLitters(litters);
         event.addSows(sows);
         
-        return mapToDto(eventRepository.save(event));
+        return eventRepository.save(event);
     }
 
     @Override
@@ -121,7 +123,7 @@ public class EventServiceImpl implements EventService{
         if(oldEvent.getEventType() == EventType.INSEMINATION){
             sows.forEach(sow -> {
                 if(litters.stream().noneMatch(l -> l.getSow().getId().equals(sow.getId()))){
-                    Litter litter = sow.getLatestOrDefaultLitter();
+                    Litter litter = sow.resolveLatestOrDefaultLitter();
                     if(litter.isFarrowed())
                         litter = Litter.defaultLitter(sow);
                     litters.add(litter);
@@ -134,6 +136,14 @@ public class EventServiceImpl implements EventService{
     public List<EventDto> getAllEvents() {
         List<Event> events = eventRepository.findAll();
         return events.stream().map(this::mapToDto).toList();
+    }
+
+    @Override
+    public List<Event> getEventsOfMonth(int year, int month){
+        YearMonth yearMonth = YearMonth.of(year, month);
+        LocalDate start = yearMonth.atDay(1);
+        LocalDate end = start.plusMonths(1).minusDays(1);
+        return eventRepository.findByDateBetween(start, end);
     }
 
     @Override

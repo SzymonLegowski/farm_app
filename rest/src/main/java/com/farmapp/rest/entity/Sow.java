@@ -6,12 +6,15 @@ import java.util.Set;
 
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.LocalDateTime;
+import java.beans.Transient;
 import java.time.LocalDate;
 
 import com.farmapp.rest.enums.EventType;
 import com.farmapp.rest.enums.SowStatus;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.annotation.Nullable;
 import jakarta.persistence.CascadeType;
@@ -44,7 +47,7 @@ public class Sow {
     
     private SowStatus status;
     
-    private Integer group;
+    private Integer groupNumber;
    
     @Nullable
     private LocalDate disposalDate;
@@ -78,7 +81,9 @@ public class Sow {
         this.note = note;
     }
 
-    public Litter getLatestOrDefaultLitter(){
+    @JsonIgnore
+    @Transient
+    public Litter resolveLatestOrDefaultLitter(){
         Litter litter = litters.stream()
             .max(Comparator.comparing(Litter::getId))
             .orElseGet(() -> Litter.defaultLitter(this));

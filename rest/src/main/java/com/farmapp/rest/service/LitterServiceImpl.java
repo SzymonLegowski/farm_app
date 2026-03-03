@@ -1,13 +1,18 @@
 package com.farmapp.rest.service;
 
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
+import com.farmapp.rest.dto.LitterDto;
+import com.farmapp.rest.entity.Event;
 import com.farmapp.rest.entity.Litter;
+import com.farmapp.rest.exceptions.NotFoundException;
 import com.farmapp.rest.repository.LitterRepository;
 
 @Service
@@ -26,8 +31,14 @@ public class LitterServiceImpl implements LitterService{
     }
 
     @Override
-    public Litter updateLitter(Litter litterDto) {
-        return litterRepository.save(litterDto);
+    public LitterDto updateLitter(Long id, LitterDto litterDto) {
+        Litter litter = litterRepository.findById(id).orElseThrow(() -> new NotFoundException("Litter not found"));
+        litter.setBornAlive(litterDto.bornAlive());
+        litter.setBornDeceased(litterDto.bornDeceased());
+        litter.setDeceased(litterDto.deceased());
+        litter.setWeaned(litterDto.weaned());
+        Litter updatedLitter = litterRepository.save(litter);
+        return mapToDto(updatedLitter);
     }
 
     @Override
@@ -51,19 +62,20 @@ public class LitterServiceImpl implements LitterService{
         litterRepository.deleteById(id);
     }
 
-    // private LitterDto mapToDto(Litter litter){
-    //     LitterDto litterDto = new LitterDto(
-    //         litter.getId(), 
-    //         litter.getBornAlive(),
-    //         litter.getBornDeceased(),
-    //         litter.getDeceased(),
-    //         litter.getWeaned(),
-    //         litter.getNote(),
-    //         litter.getSow().getId(),
-    //         litter.getEvents().stream().map(Event::getId).collect(Collectors.toList())
-    //     );
-    //     return litterDto;
-    // }
+    private LitterDto mapToDto(Litter litter){
+        Set<Long> events = litter.getEvents().stream().map(Event::getId).collect(Collectors.toSet());
+        LitterDto litterDto = new LitterDto(
+            litter.getId(), 
+            litter.getBornAlive(),
+            litter.getBornDeceased(),
+            litter.getDeceased(),
+            litter.getWeaned(),
+            litter.getNote(),
+            litter.getSow().getId(),
+            events
+        );
+        return litterDto;
+    }
 
     // private Litter mapToEntity(LitterDto litterDto){
     //     Litter litter = new Litter();

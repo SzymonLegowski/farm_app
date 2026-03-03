@@ -42,7 +42,7 @@ public class SowServiceImpl implements SowService{
             sow.setNote(sowDto.note());
         if(sowDto.disposalDate() != null)
             sow.setDisposalDate(sowDto.disposalDate());
-        sow.setGroup(null);
+        sow.setGroupNumber(sowDto.group());
         Sow updatedSow = sowRepository.save(sow);
         return mapToDto(updatedSow);
     }
@@ -86,7 +86,7 @@ public class SowServiceImpl implements SowService{
             sow.setNote(sowDto.note());
         else
             sow.setNote("");
-        sow.setGroup(sowDto.group());
+        sow.setGroupNumber(sowDto.group());
         return sow;
     }
 
@@ -101,7 +101,7 @@ public class SowServiceImpl implements SowService{
             sow.getId(),
             sow.getNumber(),
             sow.getStatus(),
-            sow.getGroup(), 
+            sow.getGroupNumber(), 
             sow.getDisposalDate(),
             sow.getNote(),
             eventIds,
