@@ -1,9 +1,8 @@
 <template>
     <Navigation />
-    SowDetails
+    Dashboard
 </template>
 <script setup>
 import Navigation from '@/components/Navigation.vue';
-import TopBar from '@/components/TopBar.vue';
 
 </script>

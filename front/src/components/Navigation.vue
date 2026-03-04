@@ -1,20 +1,37 @@
 <template>
     <div class="menu">
-        <div class="menu-arrow">-></div>
-        <div class="menu-header">Menu</div>
+        <div class="menu-arrow">
+            &rarr;
+        </div>
+        <div class="menu-header">
+            Menu
+        </div>
         <div class="button-container">
-            <button class="button">
+            <button class="button" @click="toDashboard">
                 Strona główna
             </button>
-            <button class="button">
+            <button class="button" @click="toCalendar">
                 Kalendarz
             </button>
-            <button class="button">
+            <button class="button" @click="toSowDetails">
                 Karta lochy
             </button>
         </div>
     </div>
 </template>
+<script setup>
+    import { useRouter } from 'vue-router';
+    const router = useRouter()
+    const toDashboard = () => {
+        router.push('/dashboard')
+    }
+    const toCalendar = () => {
+        router.push('/calendar')
+    }
+    const toSowDetails = () => {
+        router.push('/sowDetails')
+    }
+</script>
 <style scoped>
 .menu{
     display: flex;
@@ -60,8 +77,12 @@
 }
 .menu-arrow{
     position: absolute;
-    right: 10px;
+    left: 205px;
+    text-align: center;
+    font-size: 25px;
+    padding: 10px;
 }
+
 .button {
   padding: 1.3em 3em;
   font-size: 14px;

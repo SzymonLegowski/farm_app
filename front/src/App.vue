@@ -1,12 +1,10 @@
 <template>
-  <Navigation/>
+  <RouterView/>
 </template>
 
 <script setup>
-import Navigation from './components/Navigation.vue';
+  import { useRouter } from 'vue-router'
+  const router = useRouter()
 
+  router.push('/dashboard')
 </script>
-
-<style scoped>
-    
-</style>
