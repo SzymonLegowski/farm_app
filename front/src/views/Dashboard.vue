@@ -1,8 +1,7 @@
 <template>
-    <Navigation />
-    Dashboard
+    <TopBar title="Strona główna"/>
 </template>
 <script setup>
-import Navigation from '@/components/Navigation.vue';
+import TopBar from '@/components/TopBar.vue';
 
 </script>

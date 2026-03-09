@@ -1,5 +1,6 @@
 package com.farmapp.rest.entity;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
@@ -7,7 +8,6 @@ import java.util.Set;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import com.farmapp.rest.enums.EventType;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import jakarta.persistence.Column;
@@ -35,6 +35,12 @@ public class Litter {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = true)
+    private LocalDate farrowing;
+    
+    @Column(nullable = true)
+    private LocalDate weaning;
+
     private Integer bornAlive;
     
     private Integer bornDeceased;
@@ -55,19 +61,12 @@ public class Litter {
 
     @ManyToMany(mappedBy = "litters", fetch = FetchType.EAGER)
     @JsonIgnoreProperties({"litters", "sows"})
-    private Set<Event> events = new HashSet<>();
+    private Set<Insemination> inseminations = new HashSet<>(); 
 
     @ManyToOne
     @JoinColumn(name = "sowId", nullable = false)
-    @JsonIgnoreProperties({"events", "litters"})
+    @JsonIgnoreProperties({"inseminations", "litters"})
     private Sow sow;
-
-    public boolean isFarrowed(){
-        return events.stream()
-            .filter(e -> e.getEventType().equals(EventType.FARROWING))
-            .findFirst()
-            .isPresent();
-    }
 
     public static Litter defaultLitter(Sow sow){
         Litter litter = new Litter();

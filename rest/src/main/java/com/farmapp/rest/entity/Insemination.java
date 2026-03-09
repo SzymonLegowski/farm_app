@@ -8,7 +8,6 @@ import java.util.Set;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import com.farmapp.rest.enums.EventType;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import jakarta.persistence.CascadeType;
@@ -31,16 +30,16 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Event {
+public class Insemination {
     
     @Id
     @GeneratedValue(strategy=GenerationType.IDENTITY)
     private Long id;
     
-    private EventType eventType;
-    
     private LocalDate date;
     
+    private String breed;
+
     private String note;
     
     @CreationTimestamp()
@@ -51,33 +50,33 @@ public class Event {
     @Column(updatable = false, nullable = false)
     private LocalDateTime dateModified;
 
-    @ManyToMany(mappedBy = "events", fetch = FetchType.EAGER)
-    @JsonIgnoreProperties({"events", "litters"})
+    @ManyToMany(mappedBy = "inseminations", fetch = FetchType.EAGER)
+    @JsonIgnoreProperties({"inseminations", "litters"})
     private Set<Sow> sows = new HashSet<>();
     
     @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
     @JoinTable(
-        name = "event_litter",
-        joinColumns = @JoinColumn(name = "event_id"),
+        name = "insemination_litter",
+        joinColumns = @JoinColumn(name = "insemination_id"),
         inverseJoinColumns = @JoinColumn(name = "litter_id"))
-    @JsonIgnoreProperties({"sow","events"})
+    @JsonIgnoreProperties({"sow","inseminations"})
     private Set<Litter> litters = new HashSet<>();
 
     public void addLitters(Set<Litter> litters){
         this.litters.addAll(litters);
-        litters.forEach(litter -> litter.getEvents().add(this));
+        litters.forEach(litter -> litter.getInseminations().add(this));
     }
 
     public void addSows(Set<Sow> sows){
         this.sows.addAll(sows);
-        sows.forEach(sow -> sow.getEvents().add(this));
+        sows.forEach(sow -> sow.getInseminations().add(this));
     }
 
     @Override
     public boolean equals(Object obj) {
         if (this == obj) return true;
         if( !(obj instanceof Sow)) return false;
-        Event other = (Event) obj;
+        Insemination other = (Insemination) obj;
         return id != null && id.equals(other.getId());
     }
 

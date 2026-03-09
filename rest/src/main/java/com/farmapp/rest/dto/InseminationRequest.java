@@ -1,7 +1,7 @@
 package com.farmapp.rest.dto;
 
-public record EventRequest(
-    EventDto eventDto,
+public record InseminationRequest(
+    InseminationDto inseminationDto,
     Boolean updateSowStatus,
     Integer sowGroup
 ) {}

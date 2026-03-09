@@ -2,17 +2,16 @@ package com.farmapp.rest.entity;
 
 import java.util.Comparator;
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.LocalDateTime;
 import java.beans.Transient;
 import java.time.LocalDate;
 
-import com.farmapp.rest.enums.EventType;
 import com.farmapp.rest.enums.SowStatus;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -62,17 +61,17 @@ public class Sow {
     
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
-        name = "sow_event",
+        name = "sow_insemination",
         joinColumns = @JoinColumn(name = "sow_id"),
-        inverseJoinColumns = @JoinColumn(name = "event_id"))
+        inverseJoinColumns = @JoinColumn(name = "insemination_id"))
     @JsonIgnoreProperties({"sows", "litters"})
-    private Set<Event> events = new HashSet<>();
+    private Set<Insemination> inseminations = new HashSet<>();
     
     @OneToMany(mappedBy = "sow", 
                fetch = FetchType.EAGER, 
                cascade = CascadeType.REMOVE, 
                orphanRemoval = true)
-    @JsonIgnoreProperties({"sow", "events"})
+    @JsonIgnoreProperties({"sow", "insemination"})
     private Set<Litter> litters = new HashSet<>();
 
     public Sow(Integer number, SowStatus status, String note){
@@ -83,24 +82,10 @@ public class Sow {
 
     @JsonIgnore
     @Transient
-    public Litter resolveLatestOrDefaultLitter(){
-        Litter litter = litters.stream()
-            .max(Comparator.comparing(Litter::getId))
-            .orElseGet(() -> Litter.defaultLitter(this));
+    public Optional<Litter> resolveLatestLitter(){
+        Optional<Litter> litter = litters.stream()
+            .max(Comparator.comparing(Litter::getId));
         return litter;
-    }
-
-    public static SowStatus getStatusByEventType(EventType eventType){
-        switch (eventType) {
-            case INSEMINATION:
-                return SowStatus.INSEMINATED;
-            case FARROWING:
-                return SowStatus.FARROWED;
-            case WEANING:
-                return SowStatus.FREE;
-            default:
-                return null;
-        }
     }
 
     @Override

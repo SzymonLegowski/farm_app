@@ -11,6 +11,7 @@ public interface SowService {
     SowDto createSow(SowDto sowDto);
     SowDto updateSow(SowDto sowDto, Long id);
     List<SowDto> getAllSows();
+    List<SowDto> getActiveSows();
     SowDto getSowById(Long id);
     List<SowDto> getSowsById(Set<Long> ids);
     Set<Sow> getSowEntitiesById(Set<Long> ids);

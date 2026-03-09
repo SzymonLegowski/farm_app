@@ -3,6 +3,7 @@ package com.farmapp.rest.controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.farmapp.rest.dto.LitterRequest;
 import com.farmapp.rest.dto.LitterDto;
 import com.farmapp.rest.entity.Litter;
 import com.farmapp.rest.service.LitterService;
@@ -33,9 +34,14 @@ public class LitterController {
     public List<Litter> getAllLitters() {
         return litterService.getAllLitters();
     }
+
+    @GetMapping("/sow/{sowId}")
+    public ResponseEntity<List<LitterDto>> getLittersBySowId(@PathVariable Long sowId){
+        return new ResponseEntity<>(litterService.getLittersBySowId(sowId), HttpStatus.OK);
+    }
     
     @PutMapping("/{id}")
-    public ResponseEntity<LitterDto> updateLitter(@PathVariable Long id, @RequestBody LitterDto litterDto) {
+    public ResponseEntity<LitterDto> updateLitter(@PathVariable Long id, @RequestBody LitterRequest litterDto) {
         return new ResponseEntity<>(litterService.updateLitter(id, litterDto), HttpStatus.OK);
     }
 }

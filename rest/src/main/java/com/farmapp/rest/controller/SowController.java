@@ -19,9 +19,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
-
-
-
 @RestController
 @RequestMapping("/api/sows")
 public class SowController {
@@ -38,10 +35,16 @@ public class SowController {
         return new ResponseEntity<>(sowService.createSow(sow), HttpStatus.CREATED);
     }
 
-    @GetMapping()
+    @GetMapping("/all")
     public ResponseEntity<List<SowDto>> getAllSows() {
         return new ResponseEntity<>(sowService.getAllSows(), HttpStatus.OK);
     }
+
+    @GetMapping()
+    public ResponseEntity<List<SowDto>> getActiveSows() {
+        return new ResponseEntity<>(sowService.getActiveSows(), HttpStatus.OK);
+    }
+    
 
     @GetMapping("/{id}")
     public ResponseEntity<SowDto> getSowById(@PathVariable Long id){
