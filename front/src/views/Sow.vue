@@ -6,6 +6,11 @@
         @dismiss="showSelectGrid = $event" 
         @select="handleSowSelect($event)"
     />
+    <SowForm
+        v-if="showSowForm"
+        :show="showSowForm"
+        @dismiss="showSowForm = $event"
+    />
     <div class="top-bar">
         <button class="button" @click="viewSelectGrid">
             Wybierz lochę
@@ -16,7 +21,7 @@
         <div class="top-bar-header">
             Grupa {{  selectedSow.group }}
         </div>
-        <button class="button">
+        <button class="button" @click="viewSowForm">
             Edytuj lochę
         </button>
     </div>
@@ -61,24 +66,27 @@
                 <td>{{ litter.bornDeceased }}</td>
                 <td>{{ litter.deceased }}</td>
                 <td style="border-right: 0px;">{{ litter.weaned }}</td>
-                <!-- <td></td>
-                <td></td> -->
             </tr>
             </tbody>
         </table>
     </div>
 </template>
-
 <script setup>
 import apiClient from '@/api/apiClient'
 import SowSelectGrid from '@/components/SowSelectGrid.vue'
+import SowForm from '@/components/SowForm.vue'
 import { ref } from 'vue'
+import emitter from '@/api/eventBus'
 
 const showSelectGrid = ref(false)
+const showSowForm = ref(false)
 const sows = ref()
 const selectedSow = ref({})
 const sowData = ref()
 const maxInseminationCount = ref(3)
+const isDataFetched = ref(false)
+
+emitter.emit('alert', {message: 'Pobieranie danych...', type: 'info'})
 
 const handleSowSelect = (sow) => {
     selectedSow.value = sow
@@ -95,14 +103,26 @@ const handleSowSelect = (sow) => {
         })
 }
 
-apiClient.get('sows')
+apiClient.get('sows', {timeout: 3000})
     .then((response) => {
         console.log(response.data)
+        emitter.emit('alert', {message: 'Dane załadowane pomyślnie', type: 'success', timeout: 500})
         sows.value = response.data
+        showSelectGrid.value = true
+        isDataFetched.value = true
         })
-    .catch((err) => console.log(err))
+    .catch((err) => {
+        console.log(err)
+        emitter.emit('alert', {message: 'Błąd podczas pobierania danych', type: 'error'})
+    })
 
 const viewSelectGrid = () => {
-    showSelectGrid.value = true
+    if(isDataFetched.value){ showSelectGrid.value = true }
+    else{ emitter.emit('alert', {message: 'Brak danych z api', type: 'error', timeout: 1000}) }
+}
+
+const viewSowForm = () => {
+    console.log("clicked")
+    showSowForm.value = true
 }
 </script>

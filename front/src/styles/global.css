@@ -16,6 +16,10 @@ body{
     padding-left: 40px;
 }
 
+.form-input-select:hover{
+    cursor: pointer;
+}
+
 /* Navigation component style */
 .nav-menu{
     display: flex;
@@ -98,17 +102,6 @@ body{
   outline: none;
 }
 
-.nav-button:hover {
-  background-color: #c48423;
-  box-shadow: 0px 15px 20px rgba(229, 183, 46, 0.4);
-  color: #fff;
-  transform: translateY(-7px);
-}
-
-.nav-button:active {
-  transform: translateY(-1px);
-}
-
 /* Top-bar component */
 
 .top-bar{
@@ -126,8 +119,9 @@ body{
     font-weight: bold;
 }
 
-/* Sow details view */
+/* Sow card view */
 .button{
+    box-sizing: border-box;
     cursor: pointer;
     font-size: 14px;
     font-family: 'Courier New', Courier, monospace;
@@ -143,11 +137,15 @@ body{
     padding: 0.5em 1em;
 }
 
-.button:hover{
-    background-color: #c48423;
-    box-shadow: 0px 15px 20px rgba(229, 183, 46, 0.4);
+.button:hover,
+.nav-button:hover{
+    box-shadow:inset 0px 0px 0px 2px #000;
+}
+
+.button:active,
+.nav-button:active{
     color: #fff;
-    transform: translateY(-7px);
+    background-color: #614c00;
 }
 
 .sow-card-container{
@@ -188,27 +186,21 @@ body{
 
 /* Sow select container */
 
-
-.sow-select-container{
+.modal-container{
     position: fixed;
-    top: 50%;
-    left: 50%;
     width: 100vw;
     height: 100vw;
-    transform: translate(-50%, -50%);
-    backdrop-filter: blur(10px);
+    backdrop-filter: blur(1px);
     z-index: 1;
 }
 .sow-select-grid{
     position: absolute;
-    top: 50%;
-    left: 50%;
+    top: 3vw;
+    left: 30vw;
     width: 40vw;
     height: 40vw;
     background-color: #fbf4dc;
-    transform: translate(-50%, -50%);
     border: 2px solid #000;
-    backdrop-filter: blur(10px);
     z-index: 1;
     display: grid;
     grid-template-columns: repeat(10, 1fr);
@@ -221,8 +213,13 @@ body{
     border-radius: 5px;
     border: none;
     font-family: 'Courier New', Courier, monospace;
+    transition: all 0.1s ease 0s;
     font-weight: 600;
     font-size: 1em;
+}
+.sow-select-grid-button:hover{
+    transform: translateY(-1px);
+    box-shadow: inset 0px 0px 0px 2px rgba(0, 0, 0, 0.4);
 }
 .bg-farrowed {
     background-color: #ff5c5c;
@@ -232,4 +229,130 @@ body{
 }
 .bg-inseminated {
     background-color: #119afd;
+}
+
+/* Sow form */
+
+.sow-form{
+    position: absolute;
+    background-color: #fbf4dc;
+    top: 5vw;
+    left: 35vw;
+    width: 30vw;
+    /* height: 30vw; */
+    display: flex;
+    flex-direction: column;
+    justify-content: start;
+    align-items: stretch;
+    gap: 20px;
+    padding: 1vw;
+    box-shadow: inset 0px 0px 0px 2px #000; 
+    z-index: 1;
+}
+
+.sow-form-header{
+    padding: 20px;
+    font-size: 1.3em;
+    font-weight: 900;
+    border-bottom: 2px solid #000;
+    text-align: center;
+    letter-spacing: 2px;
+}
+
+.sow-form-body{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: stretch;
+    gap: 20px;
+    padding: 0px 1vw;
+
+}
+
+.form-input{
+    background-color: transparent;
+    font-family: 'Courier New', Courier, monospace;
+    font-weight: 550;
+    letter-spacing: 2px;
+    height: 6vh; 
+    border: 2px solid #000;   
+    font-size: 1.1em;
+}
+
+.form-input-header{
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    font-size: 1.1em;
+    font-weight: 600;
+    letter-spacing: 2px;
+}
+
+.form-input-buttons{
+    display: flex;
+    justify-content: space-between;
+}
+
+.form-input:focus-visible{
+    outline: none;
+    box-shadow: 2px 2px 5px 2px;
+}
+
+/* Alert */
+
+.alert-close{
+    width: 2vw;
+    height: 2vw;
+    border-radius: 100px;
+    padding: 5px;
+}
+.alert-close:hover{
+    cursor: pointer;
+    border: #000 1px solid;
+}
+
+.alert{
+    position: absolute;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: start;
+    top: 1vh;
+    left: 30vw;
+    width: 40vw;
+    height: 10vh;
+    z-index: 4;
+    padding: 10px;
+    font-weight: bold;
+    background-color: #8f8f8f;
+    font-size: 1vw;
+}
+.error{
+    color: #ff0000;
+    background-color: #fcb8a6;
+    border: 2px solid #ff0000;
+}
+.success{
+    color: #01a401;
+    background-color: #7dfa6e;
+    border: 2px solid #00ff00;
+}
+.info{
+    color: #614c00;
+    background-color: #fdce69;
+    border: 2px solid #ffaa00;
+}
+.slide-fade-enter-active {
+  transition: all 0.3s ease-out;
+}
+
+.slide-fade-leave-active {
+  transition: all 0.5s ;
+}
+
+.slide-fade-enter-from {
+  transform: translateY(-10vh);
+}
+.slide-fade-leave-to {
+    opacity: 0;
 }
