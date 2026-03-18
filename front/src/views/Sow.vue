@@ -1,27 +1,26 @@
 <template>
     <SowSelectGrid 
         v-if="showSelectGrid" 
-        :show=showSelectGrid 
         :sows="sows"    
         @dismiss="showSelectGrid = $event" 
         @select="handleSowSelect($event)"
     />
     <SowForm
         v-if="showSowForm"
-        :show="showSowForm"
+        :editSow="selectedSow"
         @dismiss="showSowForm = $event"
     />
     <div class="top-bar">
         <button class="button" @click="viewSelectGrid">
             Wybierz lochę
         </button>
-        <div class="top-bar-header">
+        <div class="top-bar-header" v-if="selectedSow.number">
             Locha nr {{ selectedSow.number }}
         </div>
-        <div class="top-bar-header">
+        <div class="top-bar-header" v-if="selectedSow.number">
             Grupa {{  selectedSow.group }}
         </div>
-        <button class="button" @click="viewSowForm">
+        <button class="button" @click="viewSowForm" v-if="selectedSow.number">
             Edytuj lochę
         </button>
     </div>
@@ -86,7 +85,7 @@ const sowData = ref()
 const maxInseminationCount = ref(3)
 const isDataFetched = ref(false)
 
-emitter.emit('alert', {message: 'Pobieranie danych...', type: 'info'})
+// emitter.emit('alert', {message: 'Pobieranie danych...', type: 'info'})
 
 const handleSowSelect = (sow) => {
     selectedSow.value = sow
@@ -106,7 +105,7 @@ const handleSowSelect = (sow) => {
 apiClient.get('sows', {timeout: 3000})
     .then((response) => {
         console.log(response.data)
-        emitter.emit('alert', {message: 'Dane załadowane pomyślnie', type: 'success', timeout: 500})
+        // emitter.emit('alert', {message: 'Dane załadowane pomyślnie', type: 'success', timeout: 500})
         sows.value = response.data
         showSelectGrid.value = true
         isDataFetched.value = true
@@ -118,7 +117,7 @@ apiClient.get('sows', {timeout: 3000})
 
 const viewSelectGrid = () => {
     if(isDataFetched.value){ showSelectGrid.value = true }
-    else{ emitter.emit('alert', {message: 'Brak danych z api', type: 'error', timeout: 1000}) }
+    else{ emitter.emit('alert', {message: 'Brak połączenia z api', type: 'error', timeout: 1000}) }
 }
 
 const viewSowForm = () => {

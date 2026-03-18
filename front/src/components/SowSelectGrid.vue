@@ -14,7 +14,6 @@
     import apiClient from '@/api/apiClient'
 
     const props = defineProps({
-        show: Boolean,
         sows: Array
     })
 
