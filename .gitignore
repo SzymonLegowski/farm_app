@@ -290,3 +290,4 @@ README.html
 *.iml
 .idea
 .exercism
+tools/
