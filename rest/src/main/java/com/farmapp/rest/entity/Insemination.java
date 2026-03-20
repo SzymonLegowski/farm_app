@@ -42,12 +42,12 @@ public class Insemination {
 
     private String note;
     
-    @CreationTimestamp()
+    @CreationTimestamp
     @Column(updatable = false, nullable = false)
     private LocalDateTime dateCreated;
     
     @UpdateTimestamp
-    @Column(updatable = false, nullable = false)
+    @Column(nullable = false)
     private LocalDateTime dateModified;
 
     @ManyToMany(mappedBy = "inseminations", fetch = FetchType.EAGER)

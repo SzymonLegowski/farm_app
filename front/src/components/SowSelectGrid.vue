@@ -23,9 +23,7 @@
     }
 
     const handleClick = (number) => {
-        console.log("pressed", number)
         const selectedSow = props.sows.filter((sow) => sow.number == number)[0]
-        console.log(selectedSow)
         if(selectedSow != null){
             emit('select', selectedSow)
             dismiss();

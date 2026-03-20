@@ -39,6 +39,8 @@ public class SowServiceImpl implements SowService{
             sow.setNote(sowDto.note());
         if(sowDto.disposalDate() != null)
             sow.setDisposalDate(sowDto.disposalDate());
+        else
+            sow.setDisposalDate(null);
         sow.setGroupNumber(sowDto.group());
         Sow updatedSow = sowRepository.save(sow);
         return mapToDto(updatedSow);

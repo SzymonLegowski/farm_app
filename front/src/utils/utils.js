@@ -1,4 +1,4 @@
-const formatDate = (date) => {
+const formatDateDMY = (date) => {
     let d = String(date.getDate())
     let m = String(date.getMonth()+1)
     let y = String(date.getFullYear())
@@ -7,6 +7,48 @@ const formatDate = (date) => {
     let formattedDate = `${d}.${m}.${y}`
     return formattedDate
 }
+
+const formatDateYMD = (date) => {
+    if(date == null) return null
+    if(date.length < 1) return null
+    const data = date.split(".")
+    return `${data[2]}-${data[1]}-${data[0]}`
+}
+
+const formatStringDateDMY = (date) => {
+    if(date == null) return null
+    if(date.length < 1) return null
+    const data = date.split("-")
+    return `${data[2]}.${data[1]}.${data[0]}`
+}
+
+const calculateDays = (selectedDate) => {
+        let days = []
+        let helperDate = new Date(selectedDate)
+        let day
+        helperDate.setDate(1)
+        let dayOfWeek = helperDate.getDay()
+        if(dayOfWeek===0) dayOfWeek=7
+        for(let i = 0; i < dayOfWeek-1; i++){
+            let prevMonth = new Date(helperDate)
+            prevMonth.setDate(prevMonth.getDate() - dayOfWeek + i + 1)
+            day = prevMonth.getDate()
+            days.push({d: day, m:-1})
+        }
+        while (helperDate.getMonth() === selectedDate.getMonth()){
+            day = helperDate.getDate()
+            days.push({d: day, m:0})
+            helperDate.setDate(day + 1)
+        }
+        dayOfWeek = helperDate.getDay()
+        if(dayOfWeek !== 1)
+        for (let i = dayOfWeek-1; i<7; i++){
+            day = helperDate.getDate()
+            helperDate.setDate(day + 1)
+            days.push({d: day, m:1})
+        }
+        return days
+    }
 
 const statusesPL = ["Wolna", "Pokryta", "Karmiąca", "Padnięta", "Sprzedana"]
 const statuses = ["FREE", "INSEMINATED", "FARROWED", "DECEASED", "SOLD"]
@@ -39,7 +81,10 @@ function getStatus(status){
 }
 
 export {
-    formatDate, 
+    formatStringDateDMY,
+    formatDateDMY, 
+    formatDateYMD,
+    calculateDays,
     getStatus,
     monthNames,
     statuses,

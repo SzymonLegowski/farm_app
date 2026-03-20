@@ -38,21 +38,24 @@
 <script setup>
     import { ref } from 'vue'
     import DateSelector from './DateSelector.vue'
+    import { getStatus, statusesPL, formatDateDMY, formatDateYMD } from '@/utils/utils'
 
     const emit = defineEmits(['dismiss', 'save'])
     const props = defineProps({
         editSow: Object
     })
 
-    const statusesPL = ["Wolna", "Pokryta", "Karmiąca", "Padnięta", "Sprzedana"]
-    const statuses = ["FREE", "INSEMINATED", "FARROWED", "DECEASED", "SOLD"]
     const show = ref(false)
     const editSow = ref(props.editSow)
     const group = ref(editSow.value.group)
-    const sowStatus = ref()
+    const sowStatus = ref(getStatus(editSow.value.status))
     const disposalDate = ref(editSow.value.disposalDate)
-
     const note = ref(editSow.value.note)
+
+    if(disposalDate.value == null){
+        disposalDate.value = formatDateDMY(new Date())
+    }
+
     const dismiss = () => {
         emit('dismiss', false)
     }
@@ -61,7 +64,22 @@
         editSow.value.group = group.value
         editSow.value.note = group.value
         editSow.value.status = getStatus(sowStatus.value)
-        
+        if( editSow.value.status === "DECEASED" || editSow.value.status === "SOLD" ){   
+            editSow.value.disposalDate = disposalDate.value
+        } 
+        else{
+            editSow.value.disposalDate = ""
+        }
+        let sowRequest = {
+            id: editSow.value.id,
+            number: editSow.value.number,
+            status: editSow.value.status,
+            group: editSow.value.group,
+            disposalDate: formatDateYMD(editSow.value.disposalDate),
+            note: editSow.value.note
+        }
+        emit('save', sowRequest)
+        dismiss()
     }
 
     const showDateSelector = () => {
@@ -71,32 +89,5 @@
     const handleDateSelect = (date) => {
         disposalDate.value = date
     }
-
-    function getStatus(status){
-        switch(status){
-            case statuses[0]:
-                return statusesPL[0]
-            case statuses[1]:
-                return statusesPL[1]
-            case statuses[2]:
-                return statusesPL[2]
-            case statuses[3]:
-                return statusesPL[3]
-            case statuses[4]:
-                return statusesPL[4]
-            case statusesPL[0]:
-                return statuses[0]
-            case statusesPL[1]:
-                return statuses[1]
-            case statusesPL[2]:
-                return statuses[2]
-            case statusesPL[3]:
-                return statuses[3]
-            case statusesPL[4]:
-                return statuses[4]       
-            }
-    }
-
-    sowStatus.value = getStatus(editSow.value.status)
     
 </script>

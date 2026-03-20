@@ -42,22 +42,37 @@ public class LitterServiceImpl implements LitterService{
         
         if(litterDto.bornAlive() != null)
             litter.setBornAlive(litterDto.bornAlive());
+        else
+            litter.setBornAlive(0);
+
         if(litterDto.bornDeceased() != null)
             litter.setBornDeceased(litterDto.bornDeceased());
+        else
+            litter.setBornDeceased(0);
+
         if(litterDto.deceased() != null)
             litter.setDeceased(litterDto.deceased());
+            else
+            litter.setDeceased(0);
+
         if(litterDto.weaned() != null)
             litter.setWeaned(litterDto.weaned());
+        else
+            litter.setWeaned(0);
+
         if(litterDto.farrowing() != null){
             if(litterDto.updateSowStatus())
                 litter.getSow().setStatus(SowStatus.FARROWED);
             litter.setFarrowing(litterDto.farrowing());
-        }
+        }else 
+            litter.setFarrowing(null);
+        
         if(litterDto.weaning() != null){
             if(litterDto.updateSowStatus())
                 litter.getSow().setStatus(SowStatus.FREE);
             litter.setWeaning(litterDto.weaning());
-        }
+        }else
+            litter.setWeaning(null);
         
         if(litterDto.updateSowStatus())
             sowRepository.save(litter.getSow());
@@ -115,7 +130,7 @@ public class LitterServiceImpl implements LitterService{
             litter.getFarrowing(),
             litter.getWeaning(),
             litter.getBornAlive(),
-            litter.getBornAlive(),
+            litter.getBornDeceased(),
             litter.getDeceased(),
             litter.getWeaned(),
             litter.getNote(),

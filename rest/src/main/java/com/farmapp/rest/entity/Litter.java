@@ -56,7 +56,7 @@ public class Litter {
     private LocalDateTime dateCreated;
 
     @UpdateTimestamp
-    @Column(updatable = false, nullable = false)
+    @Column(nullable = false)
     private LocalDateTime dateModified;
 
     @ManyToMany(mappedBy = "litters", fetch = FetchType.EAGER)
