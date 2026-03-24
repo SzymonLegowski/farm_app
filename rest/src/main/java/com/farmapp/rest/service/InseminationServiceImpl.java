@@ -127,7 +127,7 @@ public class InseminationServiceImpl implements InseminationService{
     }
 
     @Override
-    public List<Insemination> getInseminationsOfMonth(int year, int month){
+    public List<Insemination> getInseminationsByMonth(int year, int month){
         YearMonth yearMonth = YearMonth.of(year, month);
         LocalDate start = yearMonth.atDay(1);
         LocalDate end = start.plusMonths(1).minusDays(1);

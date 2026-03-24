@@ -39,6 +39,11 @@ public class LitterController {
     public ResponseEntity<List<LitterDto>> getLittersBySowId(@PathVariable Long sowId){
         return new ResponseEntity<>(litterService.getLittersBySowId(sowId), HttpStatus.OK);
     }
+
+    @GetMapping("/{year}/{month}")
+    public ResponseEntity<List<LitterDto>> getLittersByMonth(@PathVariable int year, @PathVariable int month){
+        return new ResponseEntity<>(litterService.getLittersByMonth(year, month), HttpStatus.OK);
+    }
     
     @PutMapping("/{id}")
     public ResponseEntity<LitterDto> updateLitter(@PathVariable Long id, @RequestBody LitterRequest litterDto) {

@@ -95,8 +95,7 @@ public class LitterServiceImpl implements LitterService{
     public List<LitterDto> getLittersByMonth(int year, int month){
         LocalDate start = LocalDate.of(year, month, 1);
         LocalDate end = start.plusMonths(1).minusDays(1);
-        List<Litter> litters = litterRepository.findByFarrowingBetween(start, end);
-        litters.addAll(litterRepository.findByWeaningBetween(start, end));
+        List<Litter> litters = litterRepository.findLittersInPeriod(start, end);
         return litters.stream().map(this::mapToLitterDto).toList();
     }
 

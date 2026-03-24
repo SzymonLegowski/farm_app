@@ -11,7 +11,7 @@ public interface InseminationService {
     Insemination createInsemination(InseminationRequest inseminationRequest);
     Insemination updateInsemination(InseminationRequest inseminationRequest, Long id);
     List<InseminationDto> getAllInseminations();
-    List<Insemination> getInseminationsOfMonth(int year, int month);
+    List<Insemination> getInseminationsByMonth(int year, int month);
     InseminationDto getInseminationById(Long id);
     List<InseminationDto> getInseminationsById(List<Long> ids);
     void deleteInsemination(Long id);

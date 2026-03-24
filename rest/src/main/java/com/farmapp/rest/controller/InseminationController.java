@@ -41,8 +41,8 @@ public class InseminationController {
     }
 
     @GetMapping("/{year}/{month}")
-    public ResponseEntity<List<Insemination>> getInseminationsOfMonth(@PathVariable int year, @PathVariable int month){
-        return new ResponseEntity<>(inseminationService.getInseminationsOfMonth(year, month), HttpStatus.OK);
+    public ResponseEntity<List<Insemination>> getInseminationsByMonth(@PathVariable int year, @PathVariable int month){
+        return new ResponseEntity<>(inseminationService.getInseminationsByMonth(year, month), HttpStatus.OK);
     }
 
     @GetMapping("/{id}")

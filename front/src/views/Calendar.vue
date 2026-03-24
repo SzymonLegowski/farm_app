@@ -9,13 +9,20 @@
             <div class="calendar-day-name" v-for="day in weekDays">{{ day }}</div>
         </div>
         <div class="calendar-body">
-            <div class="button calendar-day-select" v-for="day in days" :class="getColor(day.m)">{{ day.d }}</div>
+            <div class="button calendar-day-select" v-for="day in days" :class="getColor(day.m)">
+                {{ day.d }}
+                <div class="calendar-event">
+
+                </div>
+            </div>
         </div>
     </div>
 </template>
 <script setup>
     import { ref } from 'vue';
     import { monthNames, weekDays, calculateDays } from '@/utils/utils';
+    import apiClient from '@/api/apiClient';
+
     const date = ref(new Date())
     const days = ref(calculateDays(date.value))
     const monthYear = ref(monthNames[date.value.getMonth()] + " " + date.value.getFullYear())
@@ -23,6 +30,29 @@
         if(month !== 0)
             return "otherMonth"
         return ""
+    }
+
+    const inseminations = ref()
+    const litters = ref()
+    const events = ref()
+
+    const fetchData = () => {
+        apiClient.get(`litters/${date.value.getFullYear()}/${date.value.getMonth()+1}`)
+            .then((r) => {
+                console.log(r.data)
+                litters.value = r.data
+            })
+            .catch((e) =>{
+                console.log(e.response)
+            })
+
+        apiClient.get(`inseminations/${date.value.getFullYear()}/${date.value.getMonth()+1}`)
+            .then((r) => {
+                console.log(r.data)
+              inseminations.value = r.data
+            }).catch((e) => {
+                console.log(e.response)
+            })
     }
     
     const nextMonth = () => {
@@ -33,6 +63,7 @@
         }
         monthYear.value = monthNames[date.value.getMonth()] + " " + date.value.getFullYear()
         days.value = calculateDays(date.value)
+        fetchData()
     }
 
     const previousMonth = () => {
@@ -43,6 +74,9 @@
         }
         monthYear.value = monthNames[date.value.getMonth()] + " " + date.value.getFullYear()
         days.value = calculateDays(date.value)
+        fetchData()
     }
+
+    fetchData()
 
 </script>

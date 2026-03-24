@@ -12,4 +12,5 @@ import com.farmapp.rest.entity.Insemination;
 public interface InseminationRepository extends JpaRepository<Insemination, Long> {
     
     List<Insemination> findByDateBetween(LocalDate start, LocalDate end);
+    
 }
