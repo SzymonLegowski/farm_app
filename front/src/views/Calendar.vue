@@ -1,4 +1,10 @@
 <template>
+    <EventForm
+        v-if="showEventForm"
+        @dismiss="onEventFormClose($event)"
+        :editEvent="selectedEvent"
+        :date="selectedDate"
+    />
     <div class="calendar-container">
         <div class="date-selector-header calendar-header">
             <button class="button calendar-date-selector-button" @click="previousMonth"> < </button>
@@ -9,10 +15,18 @@
             <div class="calendar-day-name" v-for="day in weekDays">{{ day }}</div>
         </div>
         <div class="calendar-body">
-            <div class="button calendar-day-select" v-for="day in days" :class="getColor(day.m)">
+            <div class="button calendar-day-select" v-for="day in days" :class="getColor(day.m)" @click="onDayClick(day)">
                 {{ day.d }}
-                <div class="calendar-event">
-
+                <hr style="border-top: 1px solid #000" />
+                <div class="calendar-day-events">
+                    <div v-for="date in eventsByDate?.filter(e => e.date.getDate() === day.d && e.date.getMonth() === date.getMonth() + day.m)" 
+                        :key="date">
+                        <div class="calendar-day-event" :class="getClass(e.type)" v-for="e in date.events" :key="e.id" @click.stop="onEventClick(e, date)">
+                            {{ eventTypes[e.type] }}
+                            <br/>
+                            {{ e.sows.map(s => s.number).join(', ') }}
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -20,37 +34,73 @@
 </template>
 <script setup>
     import { ref } from 'vue';
-    import { monthNames, weekDays, calculateDays } from '@/utils/utils';
+    import { monthNames, weekDays, calculateDays, formatDateYMD, eventTypes } from '@/utils/utils';
     import apiClient from '@/api/apiClient';
+    import EventForm from '@/components/EventForm.vue';
 
+    const showEventForm = ref(false)
     const date = ref(new Date())
     const days = ref(calculateDays(date.value))
     const monthYear = ref(monthNames[date.value.getMonth()] + " " + date.value.getFullYear())
+    const eventsByDate = ref([])
+    const selectedEvent = ref()
+    const selectedDate = ref()
+
+    const onEventFormClose = (event) => {
+        showEventForm.value = event
+        selectedDate.value = null
+        selectedEvent.value = null
+    }
+
+    const onDayClick = (day) => {
+        selectedDate.value = new Date(date.value.getFullYear(), date.value.getMonth() + day.m, day.d)
+        showEventForm.value = true
+        console.log("day clicked: ", day)
+    }
+
+    const onEventClick = (event, date) => {
+        showEventForm.value = true
+        selectedEvent.value = event
+        selectedEvent.value.date = date.date
+        console.log("event clicked: ", event)
+    }
+
+    const getClass = (type) => {
+        switch(type){
+            case 0:
+                return "insemination"
+            case 1:
+                return "farrowing"
+            case 2:
+                return "weaning"
+            case 3:
+                return "predfarrowing"
+        }
+    }
+
     const getColor = (month) => {
         if(month !== 0)
             return "otherMonth"
         return ""
     }
 
-    const inseminations = ref()
-    const litters = ref()
-    const events = ref()
-
     const fetchData = () => {
-        apiClient.get(`litters/${date.value.getFullYear()}/${date.value.getMonth()+1}`)
+        let start = new Date(date.value)
+        let end = new Date(date.value)
+        start.setDate(1)
+        start.setDate(start.getDate() - start.getDay() + 1)
+        end.setDate(1)
+        end.setMonth(end.getMonth() + 1)
+        end.setDate(end.getDate() + 7 - end.getDay())
+        start = start.toISOString().split('T')[0]
+        end = end.toISOString().split('T')[0]
+        apiClient.get(`litters/events/${start}/${end}`)
             .then((r) => {
-                console.log(r.data)
-                litters.value = r.data
+                eventsByDate.value = r.data
+                for(let e of eventsByDate.value){ e.date = new Date(Date.parse(e.date))}
+                console.log(eventsByDate.value)
             })
             .catch((e) =>{
-                console.log(e.response)
-            })
-
-        apiClient.get(`inseminations/${date.value.getFullYear()}/${date.value.getMonth()+1}`)
-            .then((r) => {
-                console.log(r.data)
-              inseminations.value = r.data
-            }).catch((e) => {
                 console.log(e.response)
             })
     }

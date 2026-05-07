@@ -1,20 +1,16 @@
 package com.farmapp.rest.dto;
 
-import java.time.LocalDate;
 import java.util.List;
 
-
 public record LitterDto(
-    Long id,
-    List<LocalDate> inseminations,
-    LocalDate predictedFarrowing,
-    LocalDate farrowing,
-    LocalDate weaning,
+    Integer id,
+    List<InseminationDto> inseminations,
+    String predictedFarrowing,
+    String farrowing,
+    String weaning,
     Integer bornAlive,
     Integer bornDeceased,
     Integer deceased,
     Integer weaned,
-    String note,
-    Long sowId,
-    Integer sowNumber
+    String note
 ) {}

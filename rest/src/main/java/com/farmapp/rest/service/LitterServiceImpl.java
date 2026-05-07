@@ -1,21 +1,21 @@
 package com.farmapp.rest.service;
 
+import com.farmapp.rest.repository.CalendarRepository;
 import java.time.LocalDate;
-import java.util.Collections;
-import java.util.Comparator;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
-
 import org.springframework.stereotype.Service;
 
 import com.farmapp.rest.dto.LitterRequest;
 import com.farmapp.rest.dto.LitterDto;
+import com.farmapp.rest.entity.CalendarView;
 import com.farmapp.rest.entity.Insemination;
 import com.farmapp.rest.entity.Litter;
-import com.farmapp.rest.enums.SowStatus;
+import com.farmapp.rest.entity.Sow;
 import com.farmapp.rest.exceptions.NotFoundException;
 import com.farmapp.rest.repository.LitterRepository;
 import com.farmapp.rest.repository.SowRepository;
@@ -23,12 +23,14 @@ import com.farmapp.rest.repository.SowRepository;
 @Service
 public class LitterServiceImpl implements LitterService{
 
+    private final CalendarRepository calendarRepository;
     private final LitterRepository litterRepository;
     private final SowRepository sowRepository;
 
-    public LitterServiceImpl(LitterRepository litterRepository, SowRepository sowRepository){
+    public LitterServiceImpl(LitterRepository litterRepository, SowRepository sowRepository, CalendarRepository calendarRepository){
         this.litterRepository = litterRepository;
         this.sowRepository = sowRepository;
+        this.calendarRepository = calendarRepository;
     }
 
     @Override
@@ -37,9 +39,23 @@ public class LitterServiceImpl implements LitterService{
     }
 
     @Override
-    public LitterDto updateLitter(Long id, LitterRequest litterDto) {
+    public LitterDto updateLitter(Integer id, LitterRequest litterRequest) {
+        Integer sowStatus = -1;
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
+        LitterDto litterDto = litterRequest.litterDto();
         Litter litter = litterRepository.findById(id).orElseThrow(() -> new NotFoundException("Litter not found"));
-        
+        List<Insemination> inseminations = new ArrayList<>();
+        litterDto.inseminations().forEach(insDto -> {
+            LocalDate date = LocalDate.parse(insDto.date(), formatter);
+            Insemination insemination = new Insemination(date, insDto.note());
+            inseminations.add(insemination);
+        });
+
+        if(litter.getInseminations().size() < inseminations.size())
+            sowStatus = 1;
+
+        litter.setInseminations(inseminations);
+
         if(litterDto.bornAlive() != null)
             litter.setBornAlive(litterDto.bornAlive());
         else
@@ -52,7 +68,7 @@ public class LitterServiceImpl implements LitterService{
 
         if(litterDto.deceased() != null)
             litter.setDeceased(litterDto.deceased());
-            else
+            else 
             litter.setDeceased(0);
 
         if(litterDto.weaned() != null)
@@ -61,24 +77,29 @@ public class LitterServiceImpl implements LitterService{
             litter.setWeaned(0);
 
         if(litterDto.farrowing() != null){
-            if(litterDto.updateSowStatus())
-                litter.getSow().setStatus(SowStatus.FARROWED);
-            litter.setFarrowing(litterDto.farrowing());
-        }else 
+            sowStatus = 3;
+            LocalDate farrowing = LocalDate.parse(litterDto.farrowing(), formatter);
+            litter.setFarrowing(farrowing);
+        }else
             litter.setFarrowing(null);
-        
+
         if(litterDto.weaning() != null){
-            if(litterDto.updateSowStatus())
-                litter.getSow().setStatus(SowStatus.FREE);
-            litter.setWeaning(litterDto.weaning());
+            sowStatus = 0;
+            LocalDate weaning = LocalDate.parse(litterDto.weaning(), formatter);
+            litter.setWeaning(weaning);
         }else
             litter.setWeaning(null);
         
-        if(litterDto.updateSowStatus())
-            sowRepository.save(litter.getSow());
-        
+        if(litterRequest.updateSowStatus()){
+            Optional<Sow> sow = sowRepository.findById(litter.getSow().getId());
+            if(sow.isPresent()){
+                sow.get().updateStatus(sowStatus);
+                sowRepository.save(sow.get());
+            }
+        }
+
         Litter updatedLitter = litterRepository.save(litter);
-        return mapToLitterDto(updatedLitter);
+        return updatedLitter.toDto();
     }
 
     @Override
@@ -87,56 +108,32 @@ public class LitterServiceImpl implements LitterService{
     }
 
     @Override
-    public List<LitterDto> getLittersBySowId(Long sowId){
+    public List<LitterDto> getLittersBySowId(Integer sowId){
         List<Litter> litters = litterRepository.findBySowId(sowId);
-        return litters.stream().map(this::mapToLitterDto).toList();
-    }
-
-    public List<LitterDto> getLittersByMonth(int year, int month){
-        LocalDate start = LocalDate.of(year, month, 1);
-        LocalDate end = start.plusMonths(1).minusDays(1);
-        List<Litter> litters = litterRepository.findLittersInPeriod(start, end);
-        return litters.stream().map(this::mapToLitterDto).toList();
+        return litters.stream().map(Litter::toDto).toList();
     }
 
     @Override
-    public Optional<Litter> getLitterById(Long id) {
+    public Optional<Litter> getLitterById(Integer id) {
         return litterRepository.findById(id);
     }
 
     @Override
-    public Set<Litter> getLittersById(Set<Long> ids) {
+    public Set<Litter> getLittersById(Set<Integer> ids) {
         List<Litter> litters = litterRepository.findAllById(ids);
         return new LinkedHashSet<>(litters);
     }
 
     @Override
-    public void deleteLitter(Long id) {
+    public List<CalendarView> getLittersEventsInPeriod(LocalDate start, LocalDate end) {
+        List<CalendarView> calendarView = calendarRepository.findByDateBetween(start, end);
+        return calendarView;
+    }
+
+    @Override
+    public void deleteLitter(Integer id) {
         litterRepository.deleteById(id);
     }
 
-    private LitterDto mapToLitterDto(Litter litter){
-        List<LocalDate> inseminations = litter.getInseminations().stream()
-            .map(Insemination::getDate)
-            .sorted(Comparator.naturalOrder())
-            .collect(Collectors.toList());
-        
-        LocalDate predictedFarrowing = Collections.max(inseminations).plusDays(114);
-        LitterDto dto = new LitterDto(
-            litter.getId(),
-            inseminations,
-            predictedFarrowing,
-            litter.getFarrowing(),
-            litter.getWeaning(),
-            litter.getBornAlive(),
-            litter.getBornDeceased(),
-            litter.getDeceased(),
-            litter.getWeaned(),
-            litter.getNote(),
-            litter.getSow().getId(),
-            litter.getSow().getNumber()
-        );
-        return dto;
-    }
 
 }

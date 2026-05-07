@@ -2,6 +2,7 @@ package com.farmapp.rest.exceptions;
 
 import java.util.Date;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -29,6 +30,20 @@ public class GlobalExceptionHandler {
     {
         ErrorObject errorObject = createErrorObject(HttpStatus.BAD_REQUEST.value(), ex.getMessage());
         return new ResponseEntity<ErrorObject>(errorObject, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<ErrorObject> handleDataIntegrity(DataIntegrityViolationException ex){
+        if(ex.getMessage() != null && ex.getMessage().contains("unique_active_sow")) {
+            ErrorObject errorObject = createErrorObject(HttpStatus.CONFLICT.value(), "There already exists active sow with given number.");
+            return new ResponseEntity<>(errorObject, HttpStatus.CONFLICT);
+        }
+        if(ex.getMessage() != null && ex.getMessage().contains("unique_event_same_day")) {
+            ErrorObject errorObject = createErrorObject(HttpStatus.CONFLICT.value(), "There already exists event of this type on given date.");
+            return new ResponseEntity<>(errorObject, HttpStatus.CONFLICT);
+        }
+        ErrorObject errorObject = createErrorObject(HttpStatus.CONFLICT.value(), ex.getMessage());
+        return new ResponseEntity<>(errorObject, HttpStatus.CONFLICT);
     }
 
 

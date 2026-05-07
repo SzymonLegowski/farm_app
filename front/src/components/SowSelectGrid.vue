@@ -1,14 +1,16 @@
 <template>
     <div class="modal-container" @click="dismiss"></div>
-    <div class="sow-select-grid">
-        <button 
-            v-for="number in 100"
-            class="sow-select-grid-button" 
-            :class="getColorClass(number)" 
-            @click="handleClick(number)">
-                {{ number }}
-        </button>
-    </div>
+    <Transition name="">
+        <div class="sow-select-grid">
+            <button 
+                v-for="number in 100"
+                class="sow-select-grid-button" 
+                :class="getColorClass(number)" 
+                @click="handleClick(number)">
+                    {{ number }}
+            </button>
+        </div>
+    </Transition>
 </template>
 <script setup>
     import apiClient from '@/api/apiClient'
@@ -40,6 +42,7 @@
         switch (status) {
             case 'FREE': return 'bg-free'
             case 'INSEMINATED': return 'bg-inseminated'
+            case 'GRAVID': return 'bg-gravid'
             case 'FARROWED': return 'bg-farrowed'
         }
     }

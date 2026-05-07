@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.farmapp.rest.dto.SowDto;
+import com.farmapp.rest.entity.SowCardView;
 import com.farmapp.rest.service.SowService;
 
 import org.springframework.web.bind.annotation.PostMapping;
@@ -47,17 +48,22 @@ public class SowController {
     
 
     @GetMapping("/{id}")
-    public ResponseEntity<SowDto> getSowById(@PathVariable Long id){
+    public ResponseEntity<SowDto> getSowById(@PathVariable Integer id){
         return new ResponseEntity<>(sowService.getSowById(id), HttpStatus.OK);
     }
 
+    @GetMapping("/history/{id}")
+    public ResponseEntity<SowCardView> getSowHistoryById(@PathVariable Integer id){
+        return new ResponseEntity<>(sowService.getSowHistoryById(id), HttpStatus.OK);
+    }
+
     @PutMapping("/{id}")
-    public ResponseEntity<SowDto> updateSow(@PathVariable Long id, @RequestBody SowDto sow) {        
+    public ResponseEntity<SowDto> updateSow(@PathVariable Integer id, @RequestBody SowDto sow) {        
         return new ResponseEntity<>(sowService.updateSow(sow, id), HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteSow(@PathVariable Long id){
+    public ResponseEntity<String> deleteSow(@PathVariable Integer id){
         sowService.deleteSow(id);
         return new ResponseEntity<>("Sow delete", HttpStatus.OK);
     }

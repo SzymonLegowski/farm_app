@@ -2,22 +2,26 @@ package com.farmapp.rest.entity;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.Set;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.hibernate.type.SqlTypes;
 
+import com.farmapp.rest.dto.InseminationDto;
+import com.farmapp.rest.dto.LitterDto;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -33,16 +37,20 @@ public class Litter {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Integer id;
 
-    @Column(nullable = true)
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(columnDefinition = "jsonb")
+    private List<Insemination> inseminations;
+
     private LocalDate farrowing;
-    
-    @Column(nullable = true)
+
     private LocalDate weaning;
 
+    @Column(name = "born_alive")
     private Integer bornAlive;
-    
+
+    @Column(name = "born_deceased")
     private Integer bornDeceased;
     
     private Integer deceased;
@@ -53,20 +61,50 @@ public class Litter {
 
     @CreationTimestamp
     @Column(updatable = false, nullable = false)
-    private LocalDateTime dateCreated;
+    private LocalDateTime created;
 
     @UpdateTimestamp
     @Column(nullable = false)
-    private LocalDateTime dateModified;
+    private LocalDateTime modified;
 
-    @ManyToMany(mappedBy = "litters", fetch = FetchType.EAGER)
-    @JsonIgnoreProperties({"litters", "sows"})
-    private Set<Insemination> inseminations = new HashSet<>(); 
-
-    @ManyToOne
-    @JoinColumn(name = "sowId", nullable = false)
-    @JsonIgnoreProperties({"inseminations", "litters"})
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "sow_id", nullable = false)
+    @JsonIgnoreProperties({"events", "litters"})
     private Sow sow;
+
+    public LitterDto toDto(){
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
+        List<InseminationDto> insDtos = new ArrayList<>();
+        Insemination latestInsemination = inseminations.stream().max(Comparator.comparing(Insemination::getDate)).orElse(null);
+        String predictedFarrowing = "";
+        if(latestInsemination != null){
+         
+        }
+        inseminations.forEach(ins -> {
+            String date = ins.getDate().format(formatter).toString();
+            InseminationDto insDto = new InseminationDto(date, ins.getNote());
+            insDtos.add(insDto);
+        });
+        String farrowingDate = "";
+        String weaningDate = "";
+        if(farrowing != null)
+            farrowingDate = farrowing.format(formatter).toString();
+        if(weaning != null)
+            weaningDate = weaning.format(formatter).toString();
+        LitterDto dto = new LitterDto(
+            id, 
+            insDtos, 
+            predictedFarrowing,
+            farrowingDate,
+            weaningDate,
+            bornAlive,
+            bornDeceased,
+            deceased,
+            weaned,
+            note   
+        );
+        return dto;
+    }
 
     public static Litter defaultLitter(Sow sow){
         Litter litter = new Litter();

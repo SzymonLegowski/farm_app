@@ -5,7 +5,7 @@
     />
     <div class="modal-container" @click="dismiss"></div>
         <div class="sow-form">
-            <div class="sow-form-header">
+            <div class="form-header">
                 Edycja lochy nr: {{ editSow.number }}
             </div>
             <div class="sow-form-body">
@@ -45,6 +45,10 @@
         editSow: Object
     })
 
+    const dismiss = () => {
+        emit('dismiss', false)
+    }
+
     const show = ref(false)
     const editSow = ref(props.editSow)
     const group = ref(editSow.value.group)
@@ -56,9 +60,6 @@
         disposalDate.value = formatDateDMY(new Date())
     }
 
-    const dismiss = () => {
-        emit('dismiss', false)
-    }
 
     const save = () => {
         editSow.value.group = group.value

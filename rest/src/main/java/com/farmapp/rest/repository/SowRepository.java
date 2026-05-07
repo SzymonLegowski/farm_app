@@ -10,6 +10,7 @@ import com.farmapp.rest.entity.Sow;
 import com.farmapp.rest.enums.SowStatus;
 
 @Repository
-public interface SowRepository extends JpaRepository<Sow, Long> {
+public interface SowRepository extends JpaRepository<Sow, Integer>{
     List<Sow> findByStatusIsIn(Set<SowStatus> statuses);
-}
+
+   }

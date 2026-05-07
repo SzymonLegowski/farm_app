@@ -1,5 +1,5 @@
 <template>
-    <Transition name="slide-fade">
+    <Transition name="alert-transition">
         <div class="alert" :class="[type]" v-if="show">
             {{ message }}
                 <img class="alert-close" src="../assets/close.svg" @click="dismiss"/>

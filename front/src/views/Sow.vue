@@ -60,17 +60,22 @@
                 </tr>
             </thead>
             <tbody>
-            <tr v-for="(litter, index) of sowData" class="sow-card-row">
+            <tr v-for="(litter, index) of litters" class="sow-card-row">
                 <td>{{ index+1 }}</td>
-                <!-- <td v-for="n in maxInseminationCount"><input class="sow-card-input" v-model="litter.inseminations[n-1]"></td> -->
-                <td v-for="n in maxInseminationCount"> {{ litter.inseminations[n-1] }} </td>
+                <td v-for="n in maxInseminationCount">
+                <template v-if="litter.inseminations[n-1]">
+                    <input class="sow-card-insemination" v-model="litter.inseminations[n-1].date" @input="onChange(litter.id)">
+                    <input class="sow-card-insemination" v-model="litter.inseminations[n-1].note" @input="onChange(litter.id)">
+                </template>
+                </td>
+                <!-- <td v-for="n in maxInseminationCount"> {{ litter.inseminations[n-1]?.date }} </td> -->
                 <td style="background-color: rgba(125, 125, 125, 0.2); user-select: none;" >{{ litter.predictedFarrowing }}</td>
                 <td><input @input="onChange(litter.id)" class="sow-card-input" v-model="litter.farrowing"></td>
                 <td><input @input="onChange(litter.id)" class="sow-card-input" v-model="litter.weaning"></td>
-                <td><input @input="onChange(litter.id)" class="sow-card-input" v-model="litter.bornAlive"></td>
-                <td><input @input="onChange(litter.id)" class="sow-card-input" v-model="litter.bornDeceased"></td>
-                <td><input @input="onChange(litter.id)" class="sow-card-input" v-model="litter.deceased"></td>
-                <td><input @input="onChange(litter.id)" class="sow-card-input" v-model="litter.weaned"></td>
+                <td class="sow-card-litter" ><input @input="onChange(litter.id)" class="sow-card-input" v-model="litter.bornAlive"></td>
+                <td class="sow-card-litter" ><input @input="onChange(litter.id)" class="sow-card-input" v-model="litter.bornDeceased"></td>
+                <td class="sow-card-litter" ><input @input="onChange(litter.id)" class="sow-card-input" v-model="litter.deceased"></td>
+                <td class="sow-card-litter" ><input @input="onChange(litter.id)" class="sow-card-input" v-model="litter.weaned"></td>
             </tr>
             </tbody>
         <button class="button save-litter" @click="save" v-if="editedLitters.length > 0">Zapisz zmiany</button>
@@ -91,33 +96,28 @@ const showSowForm = ref(false)
 const showDateSelector = ref(false)
 const sows = ref()
 const selectedSow = ref({})
-const sowData = ref()
-const maxInseminationCount = ref(3)
+const litters = ref()
+const maxInseminationCount = ref(0)
 const isDataFetched = ref(false)
 const editedLitters = ref([])
 
 // emitter.emit('alert', {message: 'Pobieranie danych...', type: 'info'})
 
 const handleSowSelect = (sow) => {
+    maxInseminationCount.value = 1
+    litters.value = {}
+    editedLitters.value = []
     selectedSow.value = sow
-    console.log(sow)
-    apiClient.get(`litters/sow/${sow.id}`)
+    apiClient.get(`sows/history/${sow.id}`)
         .then((response) => {
-            sowData.value = response.data
-            for(let litter of sowData.value){
-                for(let i in litter.inseminations){
-                    litter.inseminations[i] = formatStringDateDMY(litter.inseminations[i])
-                }
-                litter.predictedFarrowing = formatStringDateDMY(litter.predictedFarrowing)
-                litter.farrowing = formatStringDateDMY(litter.farrowing)
-                litter.weaning = formatStringDateDMY(litter.weaning)
-                if(litter.inseminations.length > maxInseminationCount.value){
-                    maxInseminationCount.value = litter.inseminations.length
-                }
-                console.log(litter)
-            }
+            console.log(response.data.maxInsCnt)
+            litters.value = response.data.litters
+            let maxInsCnt = response.data.maxInsCnt
+            if(maxInsCnt > 0)
+                maxInseminationCount.value = response.data.maxInsCnt
+        }).catch((e) => {
+            console.log(e)
         })
-        editedLitters.value = []
 }
 
 apiClient.get('sows', {timeout: 3000})
@@ -158,30 +158,36 @@ const handleSowEdit = (editSow) => {
 }
 
 const onChange = (litterId) =>{
-    if(editedLitters.value.find(id => id === litterId)) return
+    if(editedLitters.value.find(l => l.litterId === litterId)) return
     editedLitters.value.push(litterId)
     console.log(editedLitters.value)
     
 }
 
 const save = async () =>{
+    emitter.emit('alert', {message: 'Zapisywanie zmian...', type: 'info'})
+    let maxId = Math.max(...litters.value.map(l => l.id))
     for(let litterId of editedLitters.value){
         try{       
-            let litter = sowData.value.find(l => l.id == litterId)
+            let litter = litters.value.find(l => l.id == litterId)
+            console.log(litter)
+            let isLatest = false
+            if(litter.id === maxId){isLatest = true}
             let litterRequest = {
+                litterDto : {
                 id: litter.id,
-                farrowing: formatDateYMD(litter.farrowing),
-                weaning: formatDateYMD(litter.weaning),
+                inseminations: litter.inseminations,
+                farrowing: litter.farrowing,
+                weaning: litter.weaning,
                 bornAlive: parseInt(litter.bornAlive),
                 bornDeceased: parseInt(litter.bornDeceased),
                 deceased: parseInt(litter.deceased),
                 weaned: parseInt(litter.weaned),
-                note: litter.note,
-                updateSowStatus: true,
-                sowId: selectedSow.value.id
+                note: litter.note },
+                updateSowStatus: isLatest,
             }
             await apiClient.put(`litters/${litter.id}`, litterRequest)
-            console.log(litterRequest)
+            console.log("litter request: ", litterRequest)
         }catch(e){
             console.error("Błąd przy zapisywaniu miotu", e)
             emitter.emit('alert', {message: 'Coś poszło nie tak', type: 'error'})

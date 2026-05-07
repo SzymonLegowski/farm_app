@@ -1,14 +1,16 @@
 package com.farmapp.rest.dto;
 
-import java.time.LocalDate;
+import java.util.Set;
+
 import com.farmapp.rest.enums.SowStatus;
 
 public record SowDto(
-    Long id,
+    Integer id,
     Integer number,
     SowStatus status,
     Integer group,
-    LocalDate disposalDate,
-    String note
+    String disposalDate,
+    String note,
+    Set<Integer> litterIds
 ) {}
 

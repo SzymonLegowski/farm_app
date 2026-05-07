@@ -20,7 +20,8 @@ body{
     padding-left: 40px;
     height: 100%;
 }
-/* Navigation component style */
+
+/* Navigation menu component */
 .nav-menu{
     display: flex;
     flex-direction: column;
@@ -33,6 +34,7 @@ body{
     left: -210px;
     z-index: 2;
     background-color: #fbf4dc;
+    transition: ease-in-out transform 0.15s;
 }
 
 .nav-menu-border{
@@ -48,7 +50,7 @@ body{
     border-right: 2px solid black;
 }
 .nav-menu:hover{
-    left: 0;
+    transform: translateX(210px);
     box-shadow: 10px 4px 40px 4px black;
 }
 .nav-button-container{
@@ -102,6 +104,9 @@ body{
   outline: none;
 }
 
+/* Navigation menu component end */
+
+
 /* Top-bar component */
 
 .top-bar{
@@ -119,6 +124,9 @@ body{
     font-weight: bold;
 }
 
+/* Top-bar component */
+
+
 /* Sow card view */
 .button{
     box-sizing: border-box;
@@ -126,8 +134,8 @@ body{
     font-size: 14px;
     font-family: 'Courier New', Courier, monospace;
     background-color: #cfc092;
-    border: none;
     color: #000;
+    border: none;
     font-weight: 600;
     border-radius: 45px;
     box-shadow: 0px 8px 15px rgba(0, 0, 0, 0.1);
@@ -176,23 +184,17 @@ body{
 .sow-card-row:hover{
     background-color: rgba(232, 161, 30, 0.37);
 }
-
-.sow-card-row :nth-child(n + 9){
-    width: 0px;
-    padding: 0;
-}
 .sow-card td{
     border-bottom: 1px solid black;
     border-right: 1px solid black;
     font-weight: 540;
+    max-width: 5vw;
 }
-
 .sow-card-input{
     font-family: 'Courier New', Courier, monospace;
     width: 100%;
     height: 100%;
-    padding: 15px 0px;
-    max-width: 10vw;
+    padding: 10px 0px;
     background-color: inherit;
     border: none;
     font-size: 1em;
@@ -200,6 +202,17 @@ body{
     text-align: center;
 }
 
+.sow-card-insemination{
+    font-family: 'Courier New', Courier, monospace;
+    width: 100%;
+    height: 100%;
+    background-color: inherit;
+    border: none;
+    font-size: 1em;
+    font-weight: 540;
+    text-align: center;
+
+}
 .save-litter{
     font-size: large;
     background-color: #57b757;
@@ -208,7 +221,10 @@ body{
     margin-top: 20px;
 }
 
-/* Sow select container */
+/* Sow card view end */
+
+
+/* Sow grid selector component */
 
 .modal-container{
     position: fixed;
@@ -254,8 +270,15 @@ body{
 .bg-inseminated {
     background-color: #119afd;
 }
+.bg-gravid {
+    background-color: #f0af24;
+}
 
-/* Sow form */
+/* Sow grid selector component */
+
+
+
+/* Sow form component */
 
 .sow-form{
     position: absolute;
@@ -274,7 +297,7 @@ body{
     z-index: 1;
 }
 
-.sow-form-header{
+.form-header{
     padding: 20px;
     font-size: 1.3em;
     font-weight: 900;
@@ -299,9 +322,19 @@ body{
     font-weight: 550;
     letter-spacing: 2px;
     height: 6vh; 
-    border: 2px solid #000;   
+    border: none;
+    box-shadow: inset 0px 0px 0px 2px #a3a3a3; 
     font-size: 1.1em;
     padding: 10px;
+}
+
+.form-input:hover{
+    cursor:pointer;
+    box-shadow: inset 0px 0px 0px 2px #000000;
+}
+
+.form-input:active{
+    background-color: #f8de8b;;
 }
 
 .form-input-header{
@@ -341,7 +374,9 @@ body{
     background-color: #57b757;
 }
 
-/* Alert */
+/* Sow form component end */
+
+/* Alert component */
 
 .alert-close{
     width: 2vw;
@@ -354,7 +389,7 @@ body{
     border: #000 1px solid;
 }
 .alert{
-    position: absolute;
+    position: fixed;
     display: flex;
     flex-direction: row;
     justify-content: space-between;
@@ -384,19 +419,20 @@ body{
     background-color: #fdce69;
     border: 2px solid #ffaa00;
 }
-.slide-fade-enter-active {
+.alert-transition-enter-active {
   transition: all 0.3s ease-out;
 }
-.slide-fade-leave-active {
-  transition: all 0.5s ;
+.alert-transition-leave-active {
+  transition: all 0.3s ;
 }
-.slide-fade-enter-from {
-  /* transform: translateX(10vh); */
-  opacity: 0;
+.alert-transition-enter-from {
+  transform: translateX(25vw);
 }
-.slide-fade-leave-to {
-    opacity: 0;
+.alert-transition-leave-to {
+  transform: translateX(25vw);  
 }
+
+/* Alert component end */
 
 /* Date selector component */
 
@@ -452,6 +488,8 @@ body{
     color: #6f6f6f;
 }
 
+/* Date selector component end */
+
 /* Calendar view */
 
 .calendar-container{
@@ -460,6 +498,7 @@ body{
     align-items: stretch;
     padding: 0 1vw;
     flex: 1;
+    overflow-x: hidden;
 }
 
 .calendar-header{
@@ -478,7 +517,7 @@ body{
 .calendar-weekdays{
     display: grid;
     padding: 1vh 0;
-    grid-template-columns: repeat(7, 1fr);
+    grid-template-columns: repeat(7, minmax(0,1fr));
 }
 
 .calendar-day-name{
@@ -491,9 +530,9 @@ body{
     display: grid;
     font-weight: 800;
     padding: 10px;
-    grid-template-columns: repeat(7, 1fr);
-    column-gap: 10px;
-    row-gap: 10px;
+    grid-template-columns: repeat(7, minmax(0,1fr));
+    column-gap: 5px;
+    row-gap: 7px;
     text-align: center;
     flex-grow: 2;
     justify-content: stretch;
@@ -504,3 +543,69 @@ body{
     border-radius: 0px;
     text-align: start;
 }
+
+.calendar-day-select:has(.calendar-day-event:active){
+    background-color: #cfc092;
+    color: #000;
+}
+
+.calendar-day-event{
+    padding: 5px ;
+    color: #000;
+    font-size: 0.9em;
+    text-wrap: balance;
+}
+
+.calendar-day-event:hover{
+    box-shadow:inset 0px 0px 0px 2px #000;
+}
+
+.insemination{
+    background-color: #8f8fff;
+}
+
+.insemination:active{
+    background-color: #6363f0;
+}
+
+.predfarrowing{
+    background-color: #fff676;
+    pointer-events: none;
+}
+
+.farrowing{
+    background-color: #ff7878;
+}
+
+.farrowing:active{
+    background-color: #fb5151;
+}
+
+.weaning{
+    background-color: #90ff90;
+}
+
+.weaning:active{
+    background-color: #36f436;
+}
+
+/* Calendar view end */
+
+/* Event form */
+
+.event-form-container{
+    position:absolute;
+    display: flex;
+    flex-direction: column;
+    row-gap: 1vw;
+    background-color: #fbf4dc;
+    top: 10vw;
+    left: 35vw;
+    width: 30vw;
+    z-index: 20;
+    box-shadow: inset 0px 0px 0px 2px #000; 
+    padding: 2vw;
+}
+
+/* Event form end */
+

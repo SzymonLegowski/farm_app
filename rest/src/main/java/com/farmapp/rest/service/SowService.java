@@ -5,16 +5,18 @@ import java.util.Set;
 
 import com.farmapp.rest.dto.SowDto;
 import com.farmapp.rest.entity.Sow;
+import com.farmapp.rest.entity.SowCardView;
 
 public interface SowService {
 
     SowDto createSow(SowDto sowDto);
-    SowDto updateSow(SowDto sowDto, Long id);
+    SowDto updateSow(SowDto sowDto, Integer id);
     List<SowDto> getAllSows();
     List<SowDto> getActiveSows();
-    SowDto getSowById(Long id);
-    List<SowDto> getSowsById(Set<Long> ids);
-    Set<Sow> getSowEntitiesById(Set<Long> ids);
-    void deleteSow(Long id);
+    SowDto getSowById(Integer id);
+    SowCardView getSowHistoryById(Integer id);
+    List<SowDto> getSowsById(Set<Integer> ids);
+    Set<Sow> getSowEntitiesById(Set<Integer> ids);
+    void deleteSow(Integer id);
 
 }

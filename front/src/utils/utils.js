@@ -50,10 +50,12 @@ const calculateDays = (selectedDate) => {
         return days
     }
 
-const statusesPL = ["Wolna", "Pokryta", "Karmiąca", "Padnięta", "Sprzedana"]
-const statuses = ["FREE", "INSEMINATED", "FARROWED", "DECEASED", "SOLD"]
+const statusesPL = ["Wolna", "Pokryta", "Prośna", "Karmiąca", "Padnięta", "Sprzedana"]
+const statuses = ["FREE", "INSEMINATED", "GRAVID", "FARROWED", "DECEASED", "SOLD"]
 const monthNames = ["Styczeń", "Luty", "Marzec", "Kwiecień", "Maj", "Czerwiec", "Lipiec", "Sierpień", "Wrzesień", "Październik", "Listopad", "Grudzień"]
 const weekDays = ["Pn", "Wt", "Śr", "Czw", "Pt", "Sob", "Ndz"]
+const eventTypes = ["Krycie", "Proszenie", "Odsadzanie", "P. Proszenie"]
+const eventTypesSelect = ["Krycie", "Proszenie", "Odsadzanie"]
 
 function getStatus(status){
     switch(status){
@@ -67,6 +69,8 @@ function getStatus(status){
             return statusesPL[3]
         case statuses[4]:
             return statusesPL[4]
+        case statuses[5]:
+            return statusesPL[5]
         case statusesPL[0]:
             return statuses[0]
         case statusesPL[1]:
@@ -77,6 +81,8 @@ function getStatus(status){
             return statuses[3]
         case statusesPL[4]:
             return statuses[4]       
+        case statusesPL[5]:
+            return statuses[5]       
         }
 }
 
@@ -89,5 +95,7 @@ export {
     monthNames,
     statuses,
     statusesPL,
-    weekDays
+    weekDays,
+    eventTypes,
+    eventTypesSelect
 }
