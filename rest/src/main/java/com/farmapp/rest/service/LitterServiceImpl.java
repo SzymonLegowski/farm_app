@@ -11,6 +11,7 @@ import java.util.Set;
 import org.springframework.stereotype.Service;
 
 import com.farmapp.rest.dto.LitterRequest;
+import com.farmapp.rest.dto.EventsDto;
 import com.farmapp.rest.dto.LitterDto;
 import com.farmapp.rest.entity.CalendarView;
 import com.farmapp.rest.entity.Insemination;
@@ -19,6 +20,8 @@ import com.farmapp.rest.entity.Sow;
 import com.farmapp.rest.exceptions.NotFoundException;
 import com.farmapp.rest.repository.LitterRepository;
 import com.farmapp.rest.repository.SowRepository;
+
+import jakarta.transaction.Transactional;
 
 @Service
 public class LitterServiceImpl implements LitterService{
@@ -39,6 +42,15 @@ public class LitterServiceImpl implements LitterService{
     }
 
     @Override
+    @Transactional
+    public List<LitterDto> updateLitters(List<LitterRequest> litterRequests){
+        List<LitterDto> litterDtos = new ArrayList<>();
+        litterRequests.forEach(lr -> litterDtos.add(updateLitter(lr.litterDto().id(), lr)));
+        return litterDtos;
+    }
+
+    @Override
+    @Transactional
     public LitterDto updateLitter(Integer id, LitterRequest litterRequest) {
         Integer sowStatus = -1;
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
@@ -46,10 +58,15 @@ public class LitterServiceImpl implements LitterService{
         Litter litter = litterRepository.findById(id).orElseThrow(() -> new NotFoundException("Litter not found"));
         List<Insemination> inseminations = new ArrayList<>();
         litterDto.inseminations().forEach(insDto -> {
+            if(insDto.date() == null || insDto.date().isBlank()) return;
             LocalDate date = LocalDate.parse(insDto.date(), formatter);
             Insemination insemination = new Insemination(date, insDto.note());
             inseminations.add(insemination);
         });
+        if(inseminations.isEmpty()){
+            litterRepository.delete(litter);
+            return null;
+        }
 
         if(litter.getInseminations().size() < inseminations.size())
             sowStatus = 1;
@@ -91,11 +108,9 @@ public class LitterServiceImpl implements LitterService{
             litter.setWeaning(null);
         
         if(litterRequest.updateSowStatus()){
-            Optional<Sow> sow = sowRepository.findById(litter.getSow().getId());
-            if(sow.isPresent()){
-                sow.get().updateStatus(sowStatus);
-                sowRepository.save(sow.get());
-            }
+            Sow sow = sowRepository.findById(litter.getSow().getId()).get();
+            sow.updateStatus(sowStatus);
+            sowRepository.save(sow);
         }
 
         Litter updatedLitter = litterRepository.save(litter);
@@ -125,9 +140,11 @@ public class LitterServiceImpl implements LitterService{
     }
 
     @Override
-    public List<CalendarView> getLittersEventsInPeriod(LocalDate start, LocalDate end) {
+    public EventsDto getLittersEventsInPeriod(LocalDate start, LocalDate end) {
         List<CalendarView> calendarView = calendarRepository.findByDateBetween(start, end);
-        return calendarView;
+        Integer latestSowGroup = sowRepository.getLatestSowGroup();
+        EventsDto eventsDto = new EventsDto(calendarView, latestSowGroup);
+        return eventsDto;
     }
 
     @Override

@@ -1,10 +1,25 @@
 <template>
-    <SowSelectGrid 
-        v-if="showSelectGrid" 
-        :sows="sows"    
-        @dismiss="showSelectGrid = $event" 
-        @select="handleSowSelect($event)"
-    />
+    <div class="modal-container" @click="showSelectGrid=false" v-if="showSelectGrid" >
+        <SowSelectGrid 
+            @dismiss="showSelectGrid = $event" 
+            @select="handleSowSelect($event)"
+        />
+    </div>
+    <div class="confirm-popup" v-if="askConfirm">
+        UWAGA! <br/>
+        Co najmniej 1 miot nie posiada żadnych kryć, 
+        spowoduje to jego usunięcie. <br/>
+        <br/>
+        Czy kontynuować?
+            <div class="form-input-buttons" style="margin-top: 1vw;">
+                <button class="nav-button form-input-save" @click="save">
+                    Tak
+                </button>
+                <button class="nav-button form-input-cancel" @click="askConfirm=false">
+                    Nie
+                </button>
+                </div>
+    </div>
     <SowForm
         v-if="showSowForm"
         :editSow="selectedSow"
@@ -24,6 +39,9 @@
         </div>
         <div class="top-bar-header" v-if="selectedSow.number">
             Grupa {{  selectedSow.group }}
+        </div>
+        <div class="top-bar-header" v-if="selectedSow.number">
+            {{  getStatus(selectedSow.status) }}
         </div>
         <button class="button" @click="viewSowForm" v-if="selectedSow.number">
             Edytuj lochę
@@ -78,7 +96,7 @@
                 <td class="sow-card-litter" ><input @input="onChange(litter.id)" class="sow-card-input" v-model="litter.weaned"></td>
             </tr>
             </tbody>
-        <button class="button save-litter" @click="save" v-if="editedLitters.length > 0">Zapisz zmiany</button>
+        <button class="button save-litter" @click="check" v-if="editedLitters.length > 0">Zapisz zmiany</button>
         </table>
     </div>
 </template>
@@ -88,8 +106,8 @@ import SowSelectGrid from '@/components/SowSelectGrid.vue'
 import SowForm from '@/components/SowForm.vue'
 import { ref } from 'vue'
 import emitter from '@/api/eventBus'
-import { formatStringDateDMY, formatDateYMD, formatDateDMY } from '@/utils/utils'
 import DateSelector from '@/components/DateSelector.vue'
+import { getStatus } from '@/utils/utils'
 
 const showSelectGrid = ref(false)
 const showSowForm = ref(false)
@@ -100,8 +118,7 @@ const litters = ref()
 const maxInseminationCount = ref(0)
 const isDataFetched = ref(false)
 const editedLitters = ref([])
-
-// emitter.emit('alert', {message: 'Pobieranie danych...', type: 'info'})
+const askConfirm = ref(false)
 
 const handleSowSelect = (sow) => {
     maxInseminationCount.value = 1
@@ -110,7 +127,6 @@ const handleSowSelect = (sow) => {
     selectedSow.value = sow
     apiClient.get(`sows/history/${sow.id}`)
         .then((response) => {
-            console.log(response.data.maxInsCnt)
             litters.value = response.data.litters
             let maxInsCnt = response.data.maxInsCnt
             if(maxInsCnt > 0)
@@ -137,48 +153,59 @@ const viewSelectGrid = () => {
 }
 
 const viewSowForm = () => {
-    console.log("clicked")
     showSowForm.value = true
 }
 
 const handleSowEdit = (editSow) => {
     apiClient.put(`sows/${editSow.id}`, editSow)
     .then((response) => {
-        console.log(response)
         emitter.emit('alert', {message: 'Zapisano pomyślnie', type: 'success', timeout: 1000})
         if(editSow.disposalDate != null)
             sows.value = sows.value.filter(s => s.id !== editSow.id)      
     })
     .catch((e) => {
-        console.log("e: " + e)
         console.log("e.response: " + e.response)
         emitter.emit('alert', {message: 'Coś poszło nie tak', type: 'error', timeout: 1000})
     })
-    console.log(editSow)
 }
 
 const onChange = (litterId) =>{
-    if(editedLitters.value.find(l => l.litterId === litterId)) return
+    if(editedLitters.value.includes(litterId)) return
     editedLitters.value.push(litterId)
-    console.log(editedLitters.value)
     
 }
 
+const check = () => {
+    for(let litterId of editedLitters.value){
+        let emptyInseminations = 0;
+        let litter = litters.value.find(l => l.id == litterId)
+        for(let insemination of litter.inseminations){
+            if(insemination.date === "")
+                emptyInseminations++
+        }
+        if(emptyInseminations === litter.inseminations.length){
+            askConfirm.value = true
+            return
+        }
+    }
+    save()
+}
+
 const save = async () =>{
+    askConfirm.value = false
     emitter.emit('alert', {message: 'Zapisywanie zmian...', type: 'info'})
     let maxId = Math.max(...litters.value.map(l => l.id))
+    let litterRequestList = []
     for(let litterId of editedLitters.value){
-        try{       
             let litter = litters.value.find(l => l.id == litterId)
-            console.log(litter)
             let isLatest = false
             if(litter.id === maxId){isLatest = true}
             let litterRequest = {
                 litterDto : {
                 id: litter.id,
                 inseminations: litter.inseminations,
-                farrowing: litter.farrowing,
-                weaning: litter.weaning,
+                farrowing: litter.farrowing === "" ? null : litter.farrowing,
+                weaning: litter.weaning === "" ? null : litter.weaning,
                 bornAlive: parseInt(litter.bornAlive),
                 bornDeceased: parseInt(litter.bornDeceased),
                 deceased: parseInt(litter.deceased),
@@ -186,14 +213,16 @@ const save = async () =>{
                 note: litter.note },
                 updateSowStatus: isLatest,
             }
-            await apiClient.put(`litters/${litter.id}`, litterRequest)
-            console.log("litter request: ", litterRequest)
-        }catch(e){
-            console.error("Błąd przy zapisywaniu miotu", e)
-            emitter.emit('alert', {message: 'Coś poszło nie tak', type: 'error'})
-            return
-        }
+            litterRequestList.push(litterRequest)
     }
+    try{       
+        await apiClient.put(`litters`, litterRequestList)
+    }catch(e){
+        console.error("Błąd przy zapisywaniu miotów", e)
+        emitter.emit('alert', {message: 'Coś poszło nie tak', type: 'error'})
+        return
+    }
+    handleSowSelect(selectedSow.value)
     editedLitters.value = []
     emitter.emit('alert', {message: 'Zapisano pomyślnie', type: 'success', timeout: 1000})
 }

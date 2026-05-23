@@ -23,6 +23,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.SequenceGenerator;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -36,12 +37,15 @@ import lombok.Setter;
 public class Litter {
     
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @SequenceGenerator(name="litter_id_seq", sequenceName = "litter_id_seq", allocationSize = 1)
+    @GeneratedValue(strategy=GenerationType.SEQUENCE, generator = "litter_id_seq")
     private Integer id;
+
+    private Integer number;
 
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(columnDefinition = "jsonb")
-    private List<Insemination> inseminations;
+    private List<Insemination> inseminations = new ArrayList<>();
 
     private LocalDate farrowing;
 

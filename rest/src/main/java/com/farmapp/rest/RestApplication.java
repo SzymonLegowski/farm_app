@@ -12,11 +12,6 @@ public class RestApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(RestApplication.class, args);
 	}
-	//TODO put dto mapping into entity classes
-	//TODO FIX DATABASE MODEL
-	//TODO CALENDAR
-	//TODO MASS IMPORT
-	//TODO HOMEPAGE
 	@Bean
 	public WebMvcConfigurer corsConfigurer(){
 		return new WebMvcConfigurer() {

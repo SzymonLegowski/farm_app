@@ -1,7 +1,6 @@
 <template>
-    <div class="modal-container" @click="dismiss"></div>
     <Transition name="">
-        <div class="sow-select-grid">
+        <div class="sow-select-grid" @click.stop>
             <button 
                 v-for="number in 100"
                 class="sow-select-grid-button" 
@@ -14,18 +13,18 @@
 </template>
 <script setup>
     import apiClient from '@/api/apiClient'
+    import { useSowsStore } from '@/stores/sows'
+    import { ref } from 'vue'
 
-    const props = defineProps({
-        sows: Array
-    })
 
+    const sows = ref(useSowsStore().sows)
     const emit = defineEmits(['dismiss', 'select', 'add'])
     const dismiss = () => {
         emit('dismiss', false)
     }
 
     const handleClick = (number) => {
-        const selectedSow = props.sows.filter((sow) => sow.number == number)[0]
+        const selectedSow = sows.value.filter((sow) => sow.number == number)[0]
         if(selectedSow != null){
             emit('select', selectedSow)
             dismiss();
@@ -35,8 +34,8 @@
     }
 
     const getColorClass = (number) => {
-        if(props.sows == null) return ''
-        const status = props.sows
+        if(sows.value == null) return ''
+        const status = sows.value
             .filter((sow) => sow.number == number)
             .map(sow => sow.status)[0]
         switch (status) {
@@ -57,11 +56,13 @@
         }
         await apiClient.post(`/sows`, newSow)
             .then((response) =>{
-                console.log(response)
-                props.sows.push(response.data)
+                sows.value.push(response.data)
                 emit('select', response.data)
+                emitter.emit('alert', {message: 'Dodano pomyślnie', type: 'success', timeout: 1000})
                 dismiss()
-            }).catch((err) => console.log(err))
+            }).catch((err) => {
+                emitter.emit('alert', {message: 'Błąd podczas dodawania lochy', type: 'error'})
+            })
     }
 
 </script>

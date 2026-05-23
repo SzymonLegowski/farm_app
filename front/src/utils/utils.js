@@ -1,4 +1,6 @@
 const formatDateDMY = (date) => {
+    if(date == null) return null
+    if(date.length < 1) return null
     let d = String(date.getDate())
     let m = String(date.getMonth()+1)
     let y = String(date.getFullYear())

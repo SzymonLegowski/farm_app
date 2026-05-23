@@ -4,8 +4,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.farmapp.rest.dto.LitterRequest;
+import com.farmapp.rest.dto.EventsDto;
 import com.farmapp.rest.dto.LitterDto;
-import com.farmapp.rest.entity.CalendarView;
 import com.farmapp.rest.entity.Litter;
 import com.farmapp.rest.service.LitterService;
 
@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
 
 
 
@@ -40,7 +39,7 @@ public class LitterController {
     }
 
     @GetMapping("/events/{start}/{end}")
-    public ResponseEntity<List<CalendarView>> getLittersEventsInPeriod(@PathVariable LocalDate start, @PathVariable LocalDate end) {
+    public ResponseEntity<EventsDto> getLittersEventsInPeriod(@PathVariable LocalDate start, @PathVariable LocalDate end) {
         return new ResponseEntity<>(litterService.getLittersEventsInPeriod(start, end), HttpStatus.OK);
     }
 
@@ -50,8 +49,13 @@ public class LitterController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<LitterDto> updateLitter(@PathVariable Integer id, @RequestBody LitterRequest litterDto) {
-        return new ResponseEntity<>(litterService.updateLitter(id, litterDto), HttpStatus.OK);
+    public ResponseEntity<LitterDto> updateLitter(@PathVariable Integer id, @RequestBody LitterRequest litterRequest) {
+        return new ResponseEntity<>(litterService.updateLitter(id, litterRequest), HttpStatus.OK);
+    }
+
+    @PutMapping("")
+    public ResponseEntity<List<LitterDto>> updateLitters(@RequestBody List<LitterRequest> litterRequests) {
+        return new ResponseEntity<>(litterService.updateLitters(litterRequests), HttpStatus.OK);
     }
 
     

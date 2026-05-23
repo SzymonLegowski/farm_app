@@ -4,6 +4,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.farmapp.rest.dto.EventRequest;
 import com.farmapp.rest.dto.SowDto;
 import com.farmapp.rest.entity.SowCardView;
 import com.farmapp.rest.service.SowService;
@@ -34,6 +35,13 @@ public class SowController {
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<SowDto> createSow(@RequestBody SowDto sow) {
         return new ResponseEntity<>(sowService.createSow(sow), HttpStatus.CREATED);
+    }
+
+    @PostMapping("/event")
+    @ResponseStatus(HttpStatus.CREATED)
+    public ResponseEntity<Void> createEvent(@RequestBody EventRequest eventRequest) {
+        sowService.createEvent(eventRequest);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @GetMapping("/all")

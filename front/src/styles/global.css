@@ -2,6 +2,7 @@
     box-sizing: border-box;
 }
 body{
+    display: flex;
     margin: 0;
     font-family: 'Courier New', Courier, monospace;
     background: #fbf4dc;
@@ -228,15 +229,19 @@ body{
 
 .modal-container{
     position: fixed;
-    width: 100vw;
-    height: 100vw;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    display: flex;
+    flex-direction: row;
+    gap: 1vw;
+    justify-content: center;
+    align-items: center;
     backdrop-filter: blur(1px);
     z-index: 1;
 }
 .sow-select-grid{
-    position: absolute;
-    top: 3vw;
-    left: 30vw;
     width: 40vw;
     height: 40vw;
     background-color: #fbf4dc;
@@ -281,12 +286,8 @@ body{
 /* Sow form component */
 
 .sow-form{
-    position: absolute;
     background-color: #fbf4dc;
-    top: 4vw;
-    left: 35vw;
     width: 30vw;
-    /* height: 30vw; */
     display: flex;
     flex-direction: column;
     justify-content: start;
@@ -298,7 +299,7 @@ body{
 }
 
 .form-header{
-    padding: 20px;
+    padding: 2vh;
     font-size: 1.3em;
     font-weight: 900;
     border-bottom: 2px solid #000;
@@ -321,7 +322,7 @@ body{
     font-family: 'Courier New', Courier, monospace;
     font-weight: 550;
     letter-spacing: 2px;
-    height: 6vh; 
+    min-height: 6vh; 
     border: none;
     box-shadow: inset 0px 0px 0px 2px #a3a3a3; 
     font-size: 1.1em;
@@ -594,18 +595,134 @@ body{
 /* Event form */
 
 .event-form-container{
-    position:absolute;
     display: flex;
     flex-direction: column;
     row-gap: 1vw;
     background-color: #fbf4dc;
-    top: 10vw;
-    left: 35vw;
-    width: 30vw;
+    width: 23vw;
     z-index: 20;
     box-shadow: inset 0px 0px 0px 2px #000; 
-    padding: 2vw;
+    padding: 1vw;
 }
 
+.event-sows-headers{
+    box-shadow: inset #000 0px -3px 0px -1px;
+    padding:  0.5vh 0px;
+}
+
+.event-sow-note-header{
+    flex: 2;
+}
+
+.event-sow-number-header{
+    flex: 1;    
+}
+
+.event-sow-litter_no-header{
+    flex: 1;    
+}
+
+.event-sows-container{
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    gap: 1vh;
+}
+
+.event-sow-number{
+    letter-spacing: 2px;
+    box-shadow: inset 0px 0px 0px 2px #a3a3a3; 
+    font-size: 1.1em;
+    padding: 10px;
+    flex: 1;    
+}
+
+.event-sow-litter_no{
+    flex: 1;    
+}
+
+.event-sow-note{
+    flex: 3;
+    box-shadow: inset 0px 0px 0px 2px #a3a3a3; 
+    font-family: 'Courier New', Courier, monospace;
+    padding: 0px 10px;
+    background-color: inherit;
+    border: none;
+    font-size: 1em;
+    font-weight: 540;
+    min-width: 0px;
+}
+
+.event-sow-note:hover{
+    box-shadow: inset 0px 0px 0px 2px #000000;
+}
+.event-sow-note:focus{
+    outline-style: none;
+    box-shadow: inset 0px 0px 0px 2px #000000;
+}
+
+.checkbox-wrapper {
+    display: flex;
+    gap: 1em;
+    flex-direction: row;
+    align-items: center; 
+    position: relative;  
+}
+
+.form-input-checkbox {
+    cursor: pointer;
+    appearance: none;
+    margin: 0;
+    box-shadow: inset 0px 0px 0px 2px #000000;
+    width: 1.3em;
+    height: 1.3em;
+    flex-shrink: 0;
+}
+
+.checkbox-checkmark {
+    position: absolute;
+    left: 0.1em; 
+    top: 50%;
+    transform: translateY(-50%);
+    width: 0.9em;  
+    height: 0.9em;
+    pointer-events: none; 
+    
+    display: none; 
+    
+    fill: none;
+    stroke: #000000;       
+    stroke-width: 6px;     
+    stroke-linecap: round;  
+    stroke-linejoin: round; 
+}
+
+.form-input-checkbox:checked + .checkbox-checkmark {
+    display: block;
+}
+
+.checkbox-label {
+    font-weight: 600;
+    font-size: 1.1em;
+    cursor: pointer;
+    user-select: none;
+}
 /* Event form end */
 
+/* Confirm popup */
+
+.confirm-popup{
+    z-index: 1;
+    position: absolute;
+    top: 20%;
+    left: 35%;
+    background-color: #fbf4dc;
+    box-shadow: inset 0px 0px 0px 2px #000000;
+    font-weight: 600;
+    max-width: 30vw;
+    font-size: 1.3em;
+    padding: 2vw;
+    text-align: center;
+}
+
+/* Confirm popup end */

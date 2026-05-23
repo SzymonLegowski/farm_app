@@ -27,6 +27,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.SequenceGenerator;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -38,7 +39,8 @@ import lombok.NoArgsConstructor;
 public class Sow {
     
     @Id
-    @GeneratedValue(strategy=GenerationType.IDENTITY)
+    @SequenceGenerator(name="sow_id_seq", sequenceName = "sow_id_seq", allocationSize = 1)
+    @GeneratedValue(strategy=GenerationType.SEQUENCE, generator = "sow_id_seq")
     private Integer id;
     private Integer number;
     private SowStatus status;

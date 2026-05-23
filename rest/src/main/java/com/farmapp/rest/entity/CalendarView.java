@@ -6,7 +6,6 @@ import org.hibernate.annotations.Immutable;
 
 import com.fasterxml.jackson.annotation.JsonRawValue;
 
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;

@@ -3,8 +3,8 @@
         v-if="show"
         @select="handleDateSelect($event)"
     />
-    <div class="modal-container" @click="dismiss"></div>
-        <div class="sow-form">
+    <div class="modal-container" @click="dismiss">
+        <div class="sow-form" @click.stop>
             <div class="form-header">
                 Edycja lochy nr: {{ editSow.number }}
             </div>
@@ -14,7 +14,6 @@
                 </div>
                 <div class="form-input-header">Status
                     <select class="form-input" v-model="sowStatus">
-                        <option disabled value="">Wybierz jedno</option>
                         <option v-for="s in statusesPL" >{{ s }}</option>
                     </select>
                 </div>
@@ -33,6 +32,7 @@
                     </button>
                 </div>
             </div>
+        </div>
         </div>
 </template>
 <script setup>
